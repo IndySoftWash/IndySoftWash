@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+            }
+            .container {
+                padding: 20px;
+                max-width: 600px;
+                margin: auto;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                background-color: #f9f9f9;
+            }
+            .header {
+                text-align: center;
+                color: #4CAF50;
+            }
+            .content {
+                margin-top: 20px;
+            }
+            .footer {
+                margin-top: 20px;
+                text-align: center;
+                color: #777;
+                font-size: 12px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2 class="header">Your Proposal is Ready!</h2>
+            <div class="content">
+                <p>Dear <strong>${firstName} ${lastName}</strong>,</p>
+                <p>We are excited to inform you that your proposal has been successfully created. You can now review the details and take the next steps towards achieving your goals with us.</p>
+                <p><strong>Proposal ID:</strong> ${proposalClone?.uniqueid}</p>
+                <p>We look forward to assisting you further!</p>
+            </div>
+            <div class="footer">
+                <p>Thank you for choosing Indy Soft Wash.</p>
+            </div>
+        </div>
+    </body>
+</html>

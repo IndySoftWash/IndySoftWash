@@ -1,0 +1,3 @@
+scp -r -i "C:\Users\HP\Downloads\IndyWash.pem" "D:\Inern-task\Indy-Soft-Wash\server" ubuntu@18.118.155.69:
+ssh -i "C:\Users\HP\Downloads\IndyWash.pem" ubuntu@18.118.155.69
+http://18.118.155.69:8080/

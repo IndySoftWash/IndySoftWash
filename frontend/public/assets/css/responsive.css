@@ -1,0 +1,276 @@
+@media screen and (max-width : 767px) {
+    .cs-sidebar{
+        position: fixed;
+        left: -234px;
+        z-index: 999999;
+        transition: 0.5s;
+        height: 100%;
+    }
+    .dashboard-tags-layout{
+        grid-template-columns: 1fr;
+    }
+    .analysis{
+        grid-template-columns: 1fr;
+    }
+    .desk-show{
+        display: none ;
+    }
+    .mob-show{
+        display: block !important;
+    }
+    .show-sidebar{
+        left: 0 !important;
+    }
+    .main-header{
+        justify-content: space-between;
+        /* flex-direction: row-reverse; */
+    }
+    .arrow{
+        width: 30px;
+    }
+    .bell img{
+        width: 70%;
+    }
+    .profile-btn img{
+        width: 100%;
+    }
+    .mob-head-flex{
+        display: flex;
+        flex-direction: row-reverse;
+    }
+    .profile-btn{
+        gap: 4px;
+    }
+    .the-main-grid{
+        grid-template-columns: 1fr;
+    }
+    .font-1{
+        font-size: 18px;
+    }
+    .box-cs .input-section input[type="date"]{
+        width: 100%;
+        height: 32px;
+    }
+    .filter-btn{
+        padding: 6px 15px;
+        font-size: 11px;
+    }
+    .box-cs .input-section select{
+        height: 32px;
+    }
+    .font-3{
+        font-size: 12px;
+    }
+    .head-filters{
+        gap: 20px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .head-filters.mob{
+        flex-direction: row;
+        align-items: center;
+    }
+    .gap-20{
+        gap: 20px;
+    }
+    .gtc-1-2{
+        grid-template-columns: 1fr !important;
+    }
+    .gtc-3{
+        grid-template-columns: 1fr !important;
+    }
+    .edit-btn{
+        padding: 2px 7px;
+    }
+    .proposal-card .body h4 {
+        font-size: 13px;
+    }
+    .font-size-16{
+        font-size: 12px !important;
+    }
+    .font-size-35{
+        font-size: 22px !important;
+    }
+    .dashboard-tags-layout .tag-circle{
+        height: 50px;
+        width: 50px;
+    }
+    .proposal-tag-cards .tag-card{
+        width: 87%;
+    }
+    .mob-hide{
+        display: none !important;
+    }
+    .font-2{
+        font-size: 18px ;
+    }
+    .accordian-content .top-section{
+        width: 100%;
+    }
+    .graph img{
+        width: 100%;
+    }
+    .custom-table table td, .custom-table table th{
+        width: 100% !important;
+    }
+    .head-filters .part-1{
+        gap: 10px;
+    }
+    .head-filters .part-1 .search-input{
+        padding: 8px;
+    }
+    .box-cs{
+        overflow: hidden;
+    }
+    .box-cs .top-cs{
+        grid-template-columns: 1fr;
+    }
+    .gtc-3.mob {
+        grid-template-columns:  1fr 1fr 1fr !important;
+    }
+    .box-cs .input-section{
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+    .box-cs .input-section input, .box-cs .input-section textarea, .box-cs .input-section select{
+        padding: 8px;
+        font-size: 10px;
+    }
+    .grid-3-cs{
+        grid-template-columns: 1fr;
+    }
+    .grid-cs{
+        grid-template-columns: 1fr;
+    }
+    .gtc-equal{
+        grid-template-columns: 1fr !important;
+    }
+    .box-cs .header{
+        margin-bottom: 10px;
+    }
+    .gtc-4{
+        grid-template-columns: 1fr 1fr  !important;
+    }
+    .proposal-tag-cards{
+        grid-template-columns: 1fr !important;
+    }
+    .services-view-card .header button, .services-view-card .header a{
+        font-size: 10px;
+    }
+    .services-view-card{
+        gap: 15px;
+    }
+    .font-size-24{
+        font-size: 18px !important;
+    }
+    .proposal-tag-cards .tag-card p{
+        text-align: right;
+    }
+    .accordian-content h4{
+        font-size: 11px;
+    }
+    .gtc-6{
+        grid-template-columns: 1fr 1fr !important;
+    }
+    .accordian-content .body .part-2{
+        grid-template-columns: 1fr;
+    }
+    .accordian-content .header{
+        gap: 10px;
+        overflow: hidden;
+        overflow-x: scroll;
+    }
+    .accordian-content .header::-webkit-scrollbar {
+        height: 5px !important;
+      }
+      .mob-lay{
+        flex-direction: row !important;
+        justify-content: space-between !important;
+      }
+      .box-cs .mob-lay .line{
+        width: 1px;
+        height: 40px;
+        border-right: 1px solid #979797;
+      }
+    .cs-modal .layout{
+        padding: 20px;
+        height: 180px;
+        margin: 210px auto;
+        width: 290px;
+    }
+    .cs-modal .layout img{
+        top: -40px;
+        width: 25%;
+    }
+    .gtc-equal.mob {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    .filter-btn.mob {
+        font-size: 10px;
+    }
+    .service-add-layout{
+        flex-direction: column;
+    }
+    .custom-table{
+        overflow-x: scroll;
+    }
+    .custom-table table{
+        width: 100%;
+        overflow-x: visible;
+    }
+    .checkbox-item{
+        font-size: 12px;
+    }
+    .proposal-tag-cards .tag-card h4{
+        font-size: 16px;
+    }
+    .br-none{
+        border: none !important;
+    }
+    .flex-acc-btn{
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        font-family: "DM Sans";
+    }
+    .cs-accordian{
+        padding: 0;
+    }
+    .the-content-sec{
+        width: 100vw;
+    }
+    .cs-accordian-button h4{
+        font-size: 12px;
+    }
+    .proposal-data span{
+        font-size: 12px;
+    }
+    .proposal-data p{
+        font-size: 14px;
+    }
+    .service-overview-card h4{
+        font-size: 20px;
+    }
+    .service-overview-card p{
+        font-size: 14px;
+    }
+    .service-overview-card .tab-cs{
+        font-size: 12px;
+    }
+    .accordian-content .filter-btn{
+        font-size: 10px !important;
+    }
+    .p-1rem{
+        padding: 1rem 1rem !important;
+    }
+    .p-05rem{
+        padding: 0.5rem 0.5rem !important;
+    }
+    .flex-col-rev{
+        flex-direction: column-reverse;
+    }
+    .header-panel {
+        left: -25px;
+        width: 132px;
+    }
+}

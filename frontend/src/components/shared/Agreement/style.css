@@ -1,0 +1,99 @@
+.dark-mode .bg-f5f6fa {
+  background-color: #f5f6fa !important;
+}
+.dark-mode .bg-fffffe {
+  background-color: #fffffe !important;
+}
+.dark-mode .color-202224 {
+  color: #202224 !important;
+}
+.dark-mode .bg-f1f4f9 {
+  background-color: rgba(241, 244, 249, 0.58) !important;
+}
+.dark-mode .color-979797 {
+  color: #979797 !important;
+}
+.dark-mode .bg-388cff {
+  background-color: #388cff !important;
+}
+.dark-mode .color-fffffe {
+  color: #fffffe !important;
+}
+.dark-mode .color-f5f6fa {
+  color: #f5f6fa !important;
+}
+.dark-mode .bg-ff8214 {
+  background-color: #ff8214 !important;
+}
+.dark-mode .bg-e9941e {
+  background-color: #e9941e !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not(.light-mode) .bg-f5f6fa {
+    background-color: #f5f6fa !important;
+  }
+  html:not(.light-mode) .bg-fffffe {
+    background-color: #fffffe !important;
+  }
+  html:not(.light-mode) .color-202224 {
+    color: #202224 !important;
+  }
+  html:not(.light-mode) .bg-f1f4f9 {
+    background-color: rgba(241, 244, 249, 0.58) !important;
+  }
+  html:not(.light-mode) .color-979797 {
+    color: #979797 !important;
+  }
+  html:not(.light-mode) .bg-388cff {
+    background-color: #388cff !important;
+  }
+  html:not(.light-mode) .color-fffffe {
+    color: #fffffe !important;
+  }
+  html:not(.light-mode) .color-f5f6fa {
+    color: #f5f6fa !important;
+  }
+  html:not(.light-mode) .bg-ff8214 {
+    background-color: #ff8214 !important;
+  }
+  html:not(.light-mode) .bg-e9941e {
+    background-color: #e9941e !important;
+  }
+}
+
+[data-ogsc] .bg-f5f6fa {
+  background-color: #f5f6fa !important;
+}
+[data-ogsc] .bg-fffffe {
+  background-color: #fffffe !important;
+}
+[data-ogsc] .color-202224 {
+  color: #202224 !important;
+}
+[data-ogsc] .bg-f1f4f9 {
+  background-color: rgba(241, 244, 249, 0.58) !important;
+}
+[data-ogsc] .color-979797 {
+  color: #979797 !important;
+}
+[data-ogsc] .bg-388cff {
+  background-color: #388cff !important;
+}
+[data-ogsc] .color-fffffe {
+  color: #fffffe !important;
+}
+[data-ogsc] .color-f5f6fa {
+  color: #f5f6fa !important;
+}
+[data-ogsc] .bg-ff8214 {
+  background-color: #ff8214 !important;
+}
+[data-ogsc] .bg-e9941e {
+  background-color: #e9941e !important;
+}
+
+table{
+  width: 100% !important;
+  min-height: 100% !important;
+}
