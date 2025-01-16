@@ -47,10 +47,10 @@ const AdminLogin = () => {
 
   return (
     <>
-          <div className="box-cs height-100vh p-0">
+          <div className="box-cs border-radius-0 height-100vh p-0">
         <div className="container-fluid p-0">
-            <div className="row m-0">
-              <div className="col-md-4 p-0">
+            <div className="row  m-0">
+              <div className="col-md-4 p-0 mobile">
                 <form className="h-100" onSubmit={loginForm.handleSubmit}>
                   <div className="login-layout h-100 w-100">
                     <div className="flex-cs justify-center w-100">
@@ -73,7 +73,7 @@ const AdminLogin = () => {
                 </div>
                 <div className="col-md-8 p-0">
                   <div className="w-100" style={{objectFit: 'cover'}}>
-                    <img className="login-img" style={{objectFit: 'cover'}} src="assets/img/login.jpg" alt="" />
+                    <img className="login-img border-radius-0" style={{objectFit: 'cover'}} src="assets/img/login.jpg" alt="" />
                   </div>
                 </div>
             </div>

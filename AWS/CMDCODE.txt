@@ -1,3 +1,19 @@
-scp -r -i "C:\Users\HP\Downloads\IndyWash.pem" "D:\Inern-task\Indy-Soft-Wash\server" ubuntu@18.118.155.69:
+scp -r -i "C:\Users\HP\Downloads\IndyWash.pem" "D:\Inern-task\indy_soft_wash\server" ubuntu@18.118.155.69:
+
 ssh -i "C:\Users\HP\Downloads\IndyWash.pem" ubuntu@18.118.155.69
+
 http://18.118.155.69:8080/
+
+server {
+    listen 80;
+    server_name api.indysoftwash.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;  # Your application's port
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
