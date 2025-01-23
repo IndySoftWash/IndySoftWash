@@ -273,18 +273,6 @@
         left: -25px;
         width: 132px;
     }
-    .border-radius-0{
-        border-radius: 0 !important;
-    }
-    .gap-10{
-        gap: 10px !important;
-    }
-    .login-img{
-        height: auto;
-    }
-    .login-layout{
-        gap: 12px;
-    }
     .desk-show{
         display: none !important;
     }

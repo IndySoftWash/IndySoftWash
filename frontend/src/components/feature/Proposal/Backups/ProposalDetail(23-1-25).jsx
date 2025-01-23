@@ -331,8 +331,23 @@ const navigateRoute = () => {
               <div className="pt-4">
                 <div className="box-cs">
                   <div className="row flex-col-rev gap-20">
-                  <div className="col-md-12 ">
-                      <div className="grid-cs gtc-3">
+                    <div className="col-md-8">
+                      {/* <ProposalTagCard service={selectedServiceData} units={propertyData?.units}/> */}
+                        <ProposalTagCardv2 />
+                      <div className="pt-4">
+                        <ServiceViewCrad header={tabHeader} openLightbox={openLightbox} handlePreviousService={handlePreviousService} handleNextService={handleNextService} proposalid={proposalid} selectedServiceData={selectedServiceData} />
+                          {
+                            window.innerWidth < 767 && (
+                              <div className="mt-2">
+                                <NavLink to={`/service-detail/${proposalid}`} className={`btn-cs-2 bg-theme-2 txt-deco-none `}>
+                                  <i className="fa-regular fa-circle-plus" /> Add More Service
+                                </NavLink>
+                              </div>
+                            )
+                          }
+                      </div>
+                    </div>
+                    <div className="col-md-4 ">
                       <div className="proposal-data ">
                         <table>
                           <tbody>
@@ -351,12 +366,6 @@ const navigateRoute = () => {
                               <td><p>:</p></td>
                               <td><p>{propertyData?.propertyName || "N/A"}</p></td>
                             </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                      <div className="proposal-data ">
-                        <table>
-                          <tbody>
                             <tr>
                               <td><p>Contact Name</p></td>
                               <td><p>:</p></td>
@@ -375,7 +384,7 @@ const navigateRoute = () => {
                           </tbody>
                         </table>
                       </div>
-                      <div className="">
+                      <div className="pt-4">
                         <div className="service-overview-card desk-show">
                           <div><h4>Service Overview</h4></div>
                           <div>
@@ -389,25 +398,7 @@ const navigateRoute = () => {
                           </div>
                         </div>
                       </div>
-                      </div>
                     </div>
-                    <div className="col-md-12 pt-5">
-                      {/* <ProposalTagCard service={selectedServiceData} units={propertyData?.units}/> */}
-                        <ProposalTagCardv2 />
-                      <div className="pt-4">
-                        <ServiceViewCrad header={tabHeader} openLightbox={openLightbox} handlePreviousService={handlePreviousService} handleNextService={handleNextService} proposalid={proposalid} selectedServiceData={selectedServiceData} />
-                          {
-                            window.innerWidth < 767 && (
-                              <div className="mt-2">
-                                <NavLink to={`/service-detail/${proposalid}`} className={`btn-cs-2 bg-theme-2 txt-deco-none `}>
-                                  <i className="fa-regular fa-circle-plus" /> Add More Service
-                                </NavLink>
-                              </div>
-                            )
-                          }
-                      </div>
-                    </div>
-                    
                   </div>
                 </div>
               </div>

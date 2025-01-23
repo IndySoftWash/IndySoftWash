@@ -47,7 +47,7 @@ const AdminLogin = () => {
 
   return (
     <>
-          <div className="box-cs border-radius-0 height-100vh p-0">
+          <div className="box-cs height-100vh p-0">
         <div className="container-fluid p-0">
             <div className="row mob-login m-0">
               <div className="col-md-4 p-0">

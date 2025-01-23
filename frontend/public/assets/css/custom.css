@@ -129,6 +129,7 @@ li.active::after {
     width: 50px;
     height: 50px;
 	object-fit: cover;
+	border-radius: 50%;
 }
 .main-header .head-section .profile-btn .name small{
 	color: #565656;
@@ -834,11 +835,111 @@ line-height: normal;
   .proposal-tag-cards{
 	display: flex;
 	flex-wrap: nowrap;
-	align-items: center;
+	align-items: stretch;
 	/* grid-template-columns: 1fr 1fr 1fr; */
 	gap: 10px;
 	overflow: scroll;
     cursor: grab;
+
+	.tag-card-v2 {
+		border-radius: 15px;
+		border: 1px solid rgba(255, 255, 255, 0.45);
+		/* background: #388CFF; */
+		padding: 25px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: start;
+		min-height: 400px;
+		min-width: 350px;
+
+		.font-2 {
+			font-size: 20px !important;
+		}
+
+		button {
+			border-radius: 100px;
+			width: fit-content;
+			padding: 12px 20px;
+			border: 1px solid #FFF;
+			background: #FFF;
+			color: #000;
+			font-family: "DM Sans";
+			font-size: 14px;
+			font-style: normal;
+			font-weight: 500;
+			line-height: 140%; /* 25.2px */
+			margin: 0 auto;
+		}
+
+		.divider {
+			border-bottom: 1px solid;
+			margin: 25px 0;
+		}
+
+		.body {
+			padding-top: 40px;
+
+			ul {
+				padding-left: 20px;
+				color: #fff;
+				.meta {
+					margin-left: 10px;
+					display: flex;
+					flex-direction: column;
+					align-items: start;
+					justify-content: center;
+					gap: 20px;
+
+					.months {
+						display: grid;
+						grid-template-columns: 1fr 1fr 1fr 1fr;
+						align-items: center;
+						gap: 10px;
+
+						.box {
+							border-radius: 11px;
+							/* background-color: #1E67CB; */
+							padding: 10px;
+						}
+					}
+				}
+				/* display: flex;
+				flex-direction: column;
+				gap: 10px;
+				align-items: flex-start;
+				justify-content: center;
+
+				li {
+					display: flex;
+					flex-direction: column;
+					gap: 5px;
+					align-items: start;
+					justify-content: center;
+					
+					} */
+				}
+		}
+		
+		.header {
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+			gap: 10px;
+
+			.freq {
+				border-radius: 50%;
+				/* padding: 14px; */
+				/* background-color: #1E67CB; */
+				width: 50px;
+				height: 50px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex: none;
+			}
+		}
+	}
   }
 
   .proposal-tag-cards.grabbing {
@@ -938,6 +1039,9 @@ margin: 0;
 
 .font-size-24{
 	font-size: 24px !important;
+}
+.font-size-22{
+	font-size: 22px !important;
 }
 
 .services-view-card .header{
