@@ -9,9 +9,10 @@ import { updateServices } from "../../../services/ServicesService";
 import { handleUpdateServices } from "../../../redux/ServiceDataSlice";
 import DeleteServiceModal from "./Helper/DeleteServiceModal";
 import Spinner from "../../shared/Loader/Spinner";
-import DownloadAgreement from "../../shared/Agreement/DownloadAgreement";
+import DownloadAgreementV2 from "../../shared/Agreement/DownloadAgreementV2";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+
 
 const ServiceDetail = () => {
 
@@ -200,7 +201,8 @@ return (
         <DeleteServiceModal proposalid={proposalid} serviceid={deleteServiceId} />
         <AddServiceModal proposalId={proposalid} customerId={proposalData?.customer} propertyId={proposalData?.property} />
         <div ref={agreementRef} style={{position : 'absolute', left : '-260%', top : '28%' }}>
-            <DownloadAgreement serviceData={serviceData} propertyData={propertyData} customerData={customerData} />
+            <DownloadAgreementV2 serviceData={serviceData} propertyData={propertyData} customerData={customerData} />
+            {/* <DownloadAgreement serviceData={serviceData} propertyData={propertyData} customerData={customerData} /> */}
         </div>
     </>
 )

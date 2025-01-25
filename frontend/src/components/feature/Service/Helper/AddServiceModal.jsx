@@ -211,7 +211,7 @@ const AddServiceModal = ({ proposalId, customerId, propertyId }) => {
                                             /> */}
                                             {
                                                 serviceToggle ? (
-                                                <select onChange={(event)=>{handleInputChange, toggleService(event.target.value)}} className="w-100" name="name" id="">
+                                                <select onChange={(event)=>{handleInputChange(event), toggleService(event.target.value)}} className="w-100" name="name" id="">
                                                     <option value="">Service item</option>
                                                     {
                                                     services && services?.map((value, index) => {

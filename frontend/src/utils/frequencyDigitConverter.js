@@ -17,4 +17,19 @@ const frequencyDigit = [
     'monthly',
 ]
 
-export {frequencyDigitConverter, frequencyDigit}
+const short_list_month = {
+    'January' : 'Jan',
+    'February' : 'Feb',
+    'March' : 'March',
+    'April' : 'April',
+    'May' : 'May',
+    'June' : 'June',
+    'July' : 'July', 
+    'August' : 'Aug',
+    'September' : 'Sept',
+    'October' : 'Oct',
+    'November' : 'Nov',
+    'December' : 'Dec'
+}
+
+export {frequencyDigitConverter, frequencyDigit, short_list_month}
