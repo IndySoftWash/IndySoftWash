@@ -1,5 +1,4 @@
 import { NavLink, useNavigate, useParams } from "react-router-dom";
-import ProposalTagCard from "./Helper/ProposalTagCard";
 import AgreedModal from "./Helper/AgreedModal";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,7 +9,6 @@ import { handleToggleStatus, hanldeStatusActive } from "../../../redux/ServiceDa
 import { toast } from "react-toastify";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import DownloadAgreement from "../../shared/Agreement/DownloadAgreement";
 import MoreDetailModal from "./Helper/MoreDetailModal";
 import LightBox from "./Helper/LightBox";
 import { getPerCleaningCost } from "../../../utils/ArithematicCalculation";
@@ -46,8 +44,13 @@ const ProposalDetail = () => {
     if (state) {
       setLoading(true)
       toggleStatus_pdf()
+    }else {
+      setLoading(false)
+      setPopup(false)
     }
   };
+
+
 
   useEffect(() => {
     if (proposalid && rawCustomerData && rawProposalData && rawServiceData) {
@@ -150,7 +153,7 @@ const handlePreviousService = () => {
 };
 
 const openLightbox = (index) => {
-  console.log(index)
+  // console.log(index)
   setCurrentImageIndex(index);
   setIsLightboxOpen(true);
 };

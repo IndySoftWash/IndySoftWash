@@ -25,8 +25,6 @@ const EmailTemplate = ({ serviceData, propertyData, customerData }) => {
     // }
 
     useEffect(() => {    
-        console.log(propertyData)
-        console.log(serviceData)
         if (Array.isArray(serviceData)) {
             // Calculate totalSqft by summing up the sqft values of all objects in the serviceData array
             const totalSqft = serviceData.reduce(

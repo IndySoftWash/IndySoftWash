@@ -15,6 +15,7 @@ const ProposalTagCardv2 = ({ service, units, allServices }) => {
     const [isDragging, setIsDragging] = useState(false);
     const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
     const [scrollPosition, setScrollPosition] = useState({ x: 0, y: 0 });
+    const [totalSqfts, setTotalSqfts] = useState({});
 
     useEffect(()=>{
         if(service) {
@@ -23,6 +24,20 @@ const ProposalTagCardv2 = ({ service, units, allServices }) => {
             
         }
     }, [service])
+
+    // Add this useEffect to calculate totals when frequencies or services change
+    useEffect(() => {
+        if (frequencies.length > 0) {
+            const newTotalSqfts = frequencies.reduce((acc, frequency) => {
+                const total = frequency.services?.reduce((sum, service) => {
+                    return sum + (service?.sqft || 0);
+                }, 0);
+                return { ...acc, [frequency.name]: total };
+            }, {});
+            setTotalSqfts(newTotalSqfts);
+            console.log(newTotalSqfts)
+        }
+    }, [frequencies, service, allServices]);
 
     const handleCheckboxChange = async(index, value) => {
         const dataObject = {
@@ -90,9 +105,9 @@ const ProposalTagCardv2 = ({ service, units, allServices }) => {
     const Cards = ({ index, cardData }) => {
 
         // console.log(cardData?.services)
-        const totalSqft = cardData?.services?.reduce((acc, service) => {
-            return acc + (service?.sqft || 0);  // Accumulate sqft, default to 0 if not present
-        }, 0);        
+        // const totalSqft = cardData?.services?.reduce((acc, service) => {
+        //     return acc + (service?.sqft || 0);  // Accumulate sqft, default to 0 if not present
+        // }, 0);        
 
         // Dynamically assign the card background class (1, 2, 3)
         const bgThemeCardClass = `bg-theme-${(index % 3) + 1}`;
@@ -150,7 +165,7 @@ const ProposalTagCardv2 = ({ service, units, allServices }) => {
                     </div>
                 </div>
                 <div className="flex-cs">
-                <button type="button">Combined SQFT = {totalSqft}</button>
+                    <button type="button">Combined SQFT = {totalSqfts[cardData.name] || 0}</button>
                 </div>
             </div>
         );
