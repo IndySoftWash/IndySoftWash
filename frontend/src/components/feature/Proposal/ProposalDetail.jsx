@@ -292,7 +292,8 @@ const toggleStatus_pdf = async () => {
     }
   } catch (error) {
     setLoading(false);
-    toast.error(error.message || "Error processing agreement");
+    setPopup(false)
+    toast.error("Error processing agreement");
     console.error("Error sending agreement to server:", error.response?.data || error.message);
   }
 };

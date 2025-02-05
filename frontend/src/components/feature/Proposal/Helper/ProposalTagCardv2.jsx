@@ -139,28 +139,34 @@ const ProposalTagCardv2 = ({ service, units, allServices }) => {
                     </div>
                     <div className="body">
                         <ul style={{ color: '#fff' }}>
-                            {cardData.services?.map((service, serviceIndex) => {
-                                const price = service?.frequency?.filter(value => value.name === cardData.name)[0]?.price
-                                const perCleaning = getPerCleaningCost(price, service?.sqft, service?.quantity);
-                                return (
-                                    <li key={serviceIndex}>
-                                        <h4 className="font-2 mb-3">{service.name}</h4>
-                                        <div className="meta">
-                                            <p className="font-3 text-light">- &nbsp; ${perCleaning} per clean</p>
-                                            <div className="months">
-                                            {Array.isArray(service.months) && service.months.map((month, monthIndex) => (
-                                                <div key={`month-${monthIndex}-${month}`} className={`box ${bgThemeCircleClass}`}>
-                                                    <p className="font-3 text-light">
-                                                        {short_list_month[month] || month}
-                                                    </p>
+                            {cardData.services?.length > 0 ? (
+                                cardData.services.map((service, serviceIndex) => {
+                                    const price = service?.frequency?.filter(value => value.name === cardData.name)[0]?.price
+                                    const perCleaning = getPerCleaningCost(price, service?.sqft, service?.quantity);
+                                    return (
+                                        <li key={serviceIndex}>
+                                            <h4 className="font-2 mb-3">{service.name}</h4>
+                                            <div className="meta">
+                                                <p className="font-3 text-light">- &nbsp; ${perCleaning} per clean</p>
+                                                <div className="months">
+                                                {Array.isArray(service.months) && service.months.map((month, monthIndex) => (
+                                                    <div key={`month-${monthIndex}-${month}`} className={`box ${bgThemeCircleClass}`}>
+                                                        <p className="font-3 text-light">
+                                                            {short_list_month[month] || month}
+                                                        </p>
+                                                    </div>
+                                                ))}
                                                 </div>
-                                            ))}
                                             </div>
-                                        </div>
-                                        <div className="divider"></div>
-                                    </li>
-                                )
-                            })}
+                                            <div className="divider"></div>
+                                        </li>
+                                    )
+                                })
+                            ) : (
+                                <li>
+                                    <p className="font-3 text-light">No services activated </p>
+                                </li>
+                            )}
                         </ul>
                     </div>
                 </div>
