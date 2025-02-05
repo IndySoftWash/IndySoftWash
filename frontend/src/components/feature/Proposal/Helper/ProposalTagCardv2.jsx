@@ -124,7 +124,7 @@ const ProposalTagCardv2 = ({ service, units, allServices }) => {
                     </div>
                     <div className="body">
                         <ul style={{ color: '#fff' }}>
-                            {cardData.services.map((service, serviceIndex) => {
+                            {cardData.services?.map((service, serviceIndex) => {
                                 const price = service?.frequency?.filter(value => value.name === cardData.name)[0]?.price
                                 const perCleaning = getPerCleaningCost(price, service?.sqft, service?.quantity);
                                 return (
@@ -133,11 +133,13 @@ const ProposalTagCardv2 = ({ service, units, allServices }) => {
                                         <div className="meta">
                                             <p className="font-3 text-light">- &nbsp; ${perCleaning} per clean</p>
                                             <div className="months">
-                                                {service.months.map((month, monthIndex) => (
-                                                    <div key={monthIndex} className={`box ${bgThemeCircleClass}`}>
-                                                        <p className="font-3 text-light">{short_list_month[month]}</p>
-                                                    </div>
-                                                ))}
+                                            {Array.isArray(service.months) && service.months.map((month, monthIndex) => (
+                                                <div key={`month-${monthIndex}-${month}`} className={`box ${bgThemeCircleClass}`}>
+                                                    <p className="font-3 text-light">
+                                                        {short_list_month[month] || month}
+                                                    </p>
+                                                </div>
+                                            ))}
                                             </div>
                                         </div>
                                         <div className="divider"></div>

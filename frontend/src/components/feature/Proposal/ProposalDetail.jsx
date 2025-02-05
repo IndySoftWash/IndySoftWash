@@ -110,224 +110,7 @@ let getIndex = serviceData.findIndex(service => service.uniqueid === selectedSer
     });
   }, [serviceData, getIndex]);
   
-  const handleDownloadAgreement = () => {
-    const input = agreementRef.current;
-  
-    if (input) {
-      html2canvas(input, { scale: 2 }).then((canvas) => {
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "mm", "a4");
-  
-        // Get the dimensions of the A4 page
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-  
-        // Define padding (in mm)
-        const paddingTop = 10; // Top padding
-        const paddingBottom = 10; // Bottom padding
-  
-        // Available height for content after applying padding
-        const availableHeight = pdfHeight - paddingTop - paddingBottom;
-  
-        // Scale the canvas dimensions to match the PDF width
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
-        const scaledHeight = (canvasHeight * pdfWidth) / canvasWidth;
-  
-        // Number of pages required and current position in canvas
-        let yPosition = 0; // Initial Y position in the canvas
-        let currentPage = 1;
-  
-        while (yPosition < scaledHeight) {
-          // Create a canvas for the current section
-          const sectionCanvas = document.createElement("canvas");
-          const sectionContext = sectionCanvas.getContext("2d");
-  
-          sectionCanvas.width = canvasWidth;
-          sectionCanvas.height = (availableHeight * canvasWidth) / pdfWidth;
-  
-          sectionContext.drawImage(
-            canvas,
-            0,
-            yPosition * (canvasWidth / pdfWidth),
-            canvasWidth,
-            sectionCanvas.height,
-            0,
-            0,
-            sectionCanvas.width,
-            sectionCanvas.height
-          );
-  
-          const sectionImageData = sectionCanvas.toDataURL("image/png");
-  
-          // Add the section image to the PDF with padding
-          pdf.addImage(sectionImageData, "PNG", 0, paddingTop, pdfWidth, availableHeight);
-  
-          // Add a new page if more content remains
-          yPosition += sectionCanvas.height / (canvasWidth / pdfWidth);
-          if (yPosition < scaledHeight) {
-            pdf.addPage();
-            currentPage++;
-          }
-        }
-  
-        pdf.save("agreement.pdf");
-      }).catch((error) => {
-        console.error("Error generating PDF:", error);
-      });
-    }
-  };
 
-//   const toggleStatus_pdf = async () => {
-//     try {
-//         const input = agreementRef.current;
-
-//         if (!input) {
-//             throw new Error("Agreement element not found.");
-//         }
-
-//        // Generate the canvas using html2canvas
-//       const canvas = await html2canvas(input);
-//       const imgData = canvas.toDataURL("image/png");
-
-//       // Initialize jsPDF
-//       const pdf = new jsPDF("p", "mm", "a4");
-
-//       // Get the PDF's page width and calculate the corresponding height based on canvas aspect ratio
-//       const pdfWidth = pdf.internal.pageSize.getWidth();
-//       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-//       // Add the image to the PDF
-//       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-
-//       // Convert the PDF to a Blob
-//       const pdfBlob = pdf.output("blob");
-
-//         // Prepare FormData
-//         const formData = new FormData();
-//         formData.append('pdf', new File([pdfBlob], 'agreement.pdf', { type: 'application/pdf' }));
-//         formData.append('status', 'active');
-//         formData.append('proposalid', proposalid);
-//         formData.append('date', new Date().toISOString());
-//         formData.append('email', customerData?.personalDetails?.email);
-
-//         // Send the FormData to the server
-//         const response = await activeProposal(formData);
-
-//         const dataObject = {
-//           date: new Date(),
-//           proposalid,
-//           status: 'active'
-//         }
-
-//         if (response?.success) {
-//           dispatch(hanldeStatusActive(true));
-//           dispatch(handleToggleStatus(dataObject));
-//           setLoading(false);
-//           setPopup(false);
-//           toast.success(`Your Proposal is Active and Added to Active Overview`);
-//         }
-//     } catch (error) {
-//         console.error("Error sending agreement to server:", error.response?.data || error.message);
-//     }
-// };
-
-const generatePdfBlob = async (input) => {
-  // Generate the canvas using html2canvas
-  const canvas = await html2canvas(input);
-  const imgData = canvas.toDataURL("image/png");
-
-  // Initialize jsPDF
-  const pdf = new jsPDF("p", "mm", "a4");
-
-  // Get the PDF's page width and calculate the corresponding height based on canvas aspect ratio
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-  // Add the first image to the PDF
-  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-
-  // If the content exceeds one page, break it into multiple pages
-  if (pdfHeight > pdf.internal.pageSize.getHeight()) {
-    let yPosition = pdf.internal.pageSize.getHeight();
-    let remainingHeight = pdfHeight - yPosition;
-
-    // Split the image into sections and add new pages as needed
-    while (remainingHeight > 0) {
-      const sectionCanvas = document.createElement("canvas");
-      const sectionContext = sectionCanvas.getContext("2d");
-
-      // Resize the canvas to fit the remaining height for the next page
-      sectionCanvas.width = canvas.width;
-      sectionCanvas.height = pdf.internal.pageSize.getHeight();
-      sectionContext.drawImage(
-        canvas,
-        0,
-        yPosition,
-        canvas.width,
-        pdf.internal.pageSize.getHeight(),
-        0,
-        0,
-        sectionCanvas.width,
-        sectionCanvas.height
-      );
-
-      const sectionImgData = sectionCanvas.toDataURL("image/png");
-
-      // Add the section to the next page in the PDF
-      pdf.addPage();
-      pdf.addImage(sectionImgData, "PNG", 0, 0, pdfWidth, pdf.internal.pageSize.getHeight());
-
-      // Update the remaining height and yPosition
-      yPosition += pdf.internal.pageSize.getHeight();
-      remainingHeight = pdfHeight - yPosition;
-    }
-  }
-
-  // Convert the PDF to a Blob and return it
-  const pdfBlob = pdf.output("blob");
-  return pdfBlob;
-};
-
-const toggleStatus_pdf = async () => {
-  try {
-    const input = agreementRef.current;
-
-    if (!input) {
-      throw new Error("Agreement element not found.");
-    }
-
-    // Generate the PDF Blob using the optimized generatePdfBlob function
-    const pdfBlob = await generatePdfBlob(input);
-
-    // Prepare FormData
-    const formData = new FormData();
-    formData.append('pdf', new File([pdfBlob], 'agreement.pdf', { type: 'application/pdf' }));
-    formData.append('status', 'active');
-    formData.append('proposalid', proposalid);
-    formData.append('date', new Date().toISOString());
-    formData.append('email', customerData?.personalDetails?.email);
-
-    // Send the FormData to the server
-    const response = await activeProposal(formData);
-
-    const dataObject = {
-      date: new Date(),
-      proposalid,
-      status: 'active'
-    }
-
-    if (response?.success) {
-      dispatch(hanldeStatusActive(true));
-      dispatch(handleToggleStatus(dataObject));
-      setLoading(false);
-      setPopup(false);
-      toast.success(`Your Proposal is Active and Added to Active Overview`);
-    }
-  } catch (error) {
-    console.error("Error sending agreement to server:", error.response?.data || error.message);
-  }
-};
 
 const handleNextService = () => {
   // Increment index and loop back to the beginning if at the last item
@@ -380,6 +163,136 @@ const navigateRoute = () => {
   toast.success("Proposal Saved Successfully!")
   navigate('/proposal')
 }
+
+const generatePDF = async (input) => {
+  if (!input) {
+    throw new Error("Agreement element not found.");
+  }
+
+  // Return the promise chain
+  return html2canvas(input, { scale: 2 }).then((canvas) => {
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    // Get the dimensions of the A4 page
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    // Define padding (in mm)
+    const paddingTop = 10; // Top padding
+    const paddingBottom = 10; // Bottom padding
+
+    // Available height for content after applying padding
+    const availableHeight = pdfHeight - paddingTop - paddingBottom;
+
+    // Scale the canvas dimensions to match the PDF width
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    const scaledHeight = (canvasHeight * pdfWidth) / canvasWidth;
+
+    // Number of pages required and current position in canvas
+    let yPosition = 0; // Initial Y position in the canvas
+    let currentPage = 1;
+
+    while (yPosition < scaledHeight) {
+      // Create a canvas for the current section
+      const sectionCanvas = document.createElement("canvas");
+      const sectionContext = sectionCanvas.getContext("2d");
+
+      sectionCanvas.width = canvasWidth;
+      sectionCanvas.height = (availableHeight * canvasWidth) / pdfWidth;
+
+      sectionContext.drawImage(
+        canvas,
+        0,
+        yPosition * (canvasWidth / pdfWidth),
+        canvasWidth,
+        sectionCanvas.height,
+        0,
+        0,
+        sectionCanvas.width,
+        sectionCanvas.height
+      );
+
+      const sectionImageData = sectionCanvas.toDataURL("image/png");
+
+      // Add the section image to the PDF with padding
+      pdf.addImage(sectionImageData, "PNG", 0, paddingTop, pdfWidth, availableHeight);
+
+      // Add a new page if more content remains
+      yPosition += sectionCanvas.height / (canvasWidth / pdfWidth);
+      if (yPosition < scaledHeight) {
+        pdf.addPage();
+        currentPage++;
+      }
+    }
+
+    return pdf; // Return the pdf object
+  }).catch((error) => {
+    console.error("Error generating PDF:", error);
+    throw error; // Re-throw the error to be caught by the calling function
+  });
+};
+
+const handleDownloadAgreement = async () => {
+  try {
+    const input = agreementRef.current;
+    const pdf = await generatePDF(input);
+    if (pdf) {
+      pdf.save("agreement.pdf");
+    }
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+  }
+};
+
+const toggleStatus_pdf = async () => {
+  try {
+    const input = agreementRef.current;
+    if (!input) {
+      throw new Error("Agreement reference not found");
+    }
+
+    // Wait for PDF generation
+    const pdf = await generatePDF(input);
+    if (!pdf) {
+      throw new Error("Failed to generate PDF");
+    }
+
+    // Create blob and wait for it
+    const pdfBlob = await pdf.output("blob");
+    if (!pdfBlob) {
+      throw new Error("Failed to create PDF blob");
+    }
+
+    // Prepare FormData with the confirmed blob
+    const formData = new FormData();
+    formData.append('pdf', new File([pdfBlob], 'agreement.pdf', { type: 'application/pdf' }));
+    formData.append('status', 'active');
+    formData.append('proposalid', proposalid);
+    formData.append('date', new Date().toISOString());
+    formData.append('email', customerData?.personalDetails?.email);
+
+    // Send the FormData to the server
+    const response = await activeProposal(formData);
+
+    if (response?.success) {
+      dispatch(hanldeStatusActive(true));
+      dispatch(handleToggleStatus({
+        date: new Date(),
+        proposalid,
+        status: 'active'
+      }));
+      setLoading(false);
+      setPopup(false);
+      toast.success(`Your Proposal is Active and Added to Active Overview`);
+    }
+  } catch (error) {
+    setLoading(false);
+    toast.error(error.message || "Error processing agreement");
+    console.error("Error sending agreement to server:", error.response?.data || error.message);
+  }
+};
 
   return (
     <>

@@ -76,22 +76,71 @@ const ServiceDetail = () => {
 
     const handleDownloadAgreement = () => {
         const input = agreementRef.current;
-    
+      
         if (input) {
-          html2canvas(input).then((canvas) => {
+          html2canvas(input, { scale: 2 }).then((canvas) => {
             const imgData = canvas.toDataURL("image/png");
             const pdf = new jsPDF("p", "mm", "a4");
+      
+            // Get the dimensions of the A4 page
             const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    
-            pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+            // Define padding (in mm)
+            const paddingTop = 10; // Top padding
+            const paddingBottom = 10; // Bottom padding
+      
+            // Available height for content after applying padding
+            const availableHeight = pdfHeight - paddingTop - paddingBottom;
+      
+            // Scale the canvas dimensions to match the PDF width
+            const canvasWidth = canvas.width;
+            const canvasHeight = canvas.height;
+            const scaledHeight = (canvasHeight * pdfWidth) / canvasWidth;
+      
+            // Number of pages required and current position in canvas
+            let yPosition = 0; // Initial Y position in the canvas
+            let currentPage = 1;
+      
+            while (yPosition < scaledHeight) {
+              // Create a canvas for the current section
+              const sectionCanvas = document.createElement("canvas");
+              const sectionContext = sectionCanvas.getContext("2d");
+      
+              sectionCanvas.width = canvasWidth;
+              sectionCanvas.height = (availableHeight * canvasWidth) / pdfWidth;
+      
+              sectionContext.drawImage(
+                canvas,
+                0,
+                yPosition * (canvasWidth / pdfWidth),
+                canvasWidth,
+                sectionCanvas.height,
+                0,
+                0,
+                sectionCanvas.width,
+                sectionCanvas.height
+              );
+      
+              const sectionImageData = sectionCanvas.toDataURL("image/png");
+      
+              // Add the section image to the PDF with padding
+              pdf.addImage(sectionImageData, "PNG", 0, paddingTop, pdfWidth, availableHeight);
+      
+              // Add a new page if more content remains
+              yPosition += sectionCanvas.height / (canvasWidth / pdfWidth);
+              if (yPosition < scaledHeight) {
+                pdf.addPage();
+                currentPage++;
+              }
+            }
+      
             pdf.save("agreement.pdf");
           }).catch((error) => {
             console.error("Error generating PDF:", error);
           });
         }
-      };
-
+    };
     // useEffect(()=>{
     //     console.log(serviceData)
     //     console.log(customerData)
