@@ -14,11 +14,14 @@ const DeleteCustomServiceModal = ({ serviceid }) => {
     const rawServiceData = useSelector((state) => state.AdminDataSlice.admin);
 
     const deleteServiceFunc = async() => {
+        setLoading(true)
         const response = await deleteCustomService(serviceid)
         if(response.success) {
+            setLoading(false)
             dispatch(handleDeleteCustomService(serviceid))
+            const modalInstance = bootstrap.Modal.getInstance(document.getElementById('delete'));
+            modalInstance.hide();
             toast.success(`Custom Service Deleted Successfully!`);
-            clsModal.current?.click()
         }
     }
 
