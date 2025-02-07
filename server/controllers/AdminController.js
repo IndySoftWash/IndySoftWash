@@ -7,41 +7,10 @@ const path = require('path')
 const { v4: uuidv4 } = require('uuid');
 const multerS3 = require('multer-s3');
 const multer = require('multer');
-const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const { s3Client, deleteImageFromS3 } = require('../utils/aws')
+
 
 route.use('/password', require('./subController/PasswordController'))
-
-// AWS SDK Configuration
-const s3Client = new S3Client({
-    region: 'us-east-2',
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-});
-
-const deleteImageFromS3 = async (imageKey) => {
-    try {
-        if (!imageKey) {
-            console.error("Image key is missing");
-            return;
-        }
-
-        const deleteParams = {
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: imageKey,
-        };
-
-        // console.log(`Attempting to delete image: ${imageKey}`);
-        const command = new DeleteObjectCommand(deleteParams);
-        const result = await s3Client.send(command);
-
-        console.log(`Image ${imageKey} successfully deleted from S3`, result);
-    } catch (error) {
-        console.error(`Error deleting image ${imageKey} from S3:`, error);
-        throw new Error(`Failed to delete image ${imageKey} from S3`);
-    }
-};
 
 // Multer S3 storage configuration
 const storage = multerS3({

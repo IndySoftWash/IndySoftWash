@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { handleToggleActivePlan } from "../../../../redux/ServiceDataSlice";
 import { getPerCleaningCost } from "../../../../utils/ArithematicCalculation";
 
-const ProposalTagCard = ({service, units}) => {
+const ProposalTagCard = ({service, units, allServices}) => {
 
     const dispatch = useDispatch()
 

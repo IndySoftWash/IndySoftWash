@@ -1,3 +1,5 @@
+// 6 feb 2025
+
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { handleToggleActivePlan } from "../../../../redux/ServiceDataSlice";
@@ -147,7 +149,7 @@ const ProposalTagCardv2 = ({ service, units, allServices }) => {
                                         <li key={serviceIndex}>
                                             <h4 className="font-2 mb-3">{service.name}</h4>
                                             <div className="meta">
-                                                <p className="font-3 text-light">- &nbsp; ${perCleaning} per clean</p>
+                                                <p className="font-3 text-light">- &nbsp; ${Number(perCleaning).toFixed(2)} per clean</p>
                                                 <div className="months">
                                                 {Array.isArray(service.months) && service.months.map((month, monthIndex) => (
                                                     <div key={`month-${monthIndex}-${month}`} className={`box ${bgThemeCircleClass}`}>

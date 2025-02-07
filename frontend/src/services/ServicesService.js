@@ -39,9 +39,14 @@ const addExtraService = async(formData) => {
 }
 
 const updateServices = async(formData) => {
-    const response = await axios.put(`${API_URL}/service`, formData)
+    const response = await axios.put(`${API_URL}/service`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    })
     return response.data
 } 
+
 
 const deleteService = async(formData) => {
     const response = await axios.post(`${API_URL}/service/delete`, formData)
@@ -58,5 +63,16 @@ const updateCustomService = async(formData) => {
     return response.data
 }
 
+const updateServiceImage = async(formData) => {
+    const response = await axios.put(`${API_URL}/service/image`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    })
+    return response.data
+}
 
-export { addCustomService, toggleActivePlan, updateCustomService, addExtraService, deleteCustomService, updateServices, deleteService }
+
+
+
+export { addCustomService, toggleActivePlan, updateCustomService, addExtraService, deleteCustomService, updateServices, deleteService, updateServiceImage }

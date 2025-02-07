@@ -1,20 +1,21 @@
+// 6 feb 2025
+
 import { NavLink, useNavigate, useParams } from "react-router-dom";
-import ProposalTagCard from "./Helper/ProposalTagCard";
-import AgreedModal from "./Helper/AgreedModal";
+import AgreedModal from "../Helper/AgreedModal";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { formatDate } from '../../../utils/formatDate'
-import ServiceViewCrad from "./Helper/ServiceViewCrad";
-import { activeProposal } from '../../../services/ProposalService'
-import { handleToggleStatus, hanldeStatusActive } from "../../../redux/ServiceDataSlice";
+import { formatDate } from '../../../../utils/formatDate'
+import ServiceViewCrad from "../Helper/ServiceViewCrad";
+import { activeProposal } from '../../../../services/ProposalService'
+import { handleToggleStatus, hanldeStatusActive } from "../../../../redux/ServiceDataSlice";
 import { toast } from "react-toastify";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import DownloadAgreement from "../../shared/Agreement/DownloadAgreement";
-import MoreDetailModal from "./Helper/MoreDetailModal";
-import LightBox from "./Helper/LightBox";
-import { getPerCleaningCost } from "../../../utils/ArithematicCalculation";
-import ProposalTagCardv2 from "./Helper/ProposalTagCardv2";
+import MoreDetailModal from "../Helper/MoreDetailModal";
+import LightBox from "../Helper/LightBox";
+import { getPerCleaningCost } from "../../../../utils/ArithematicCalculation";
+import DownloadAgreementV2 from "../../../shared/Agreement/DownloadAgreementV2";
+import ProposalTagCard from "../Helper/ProposalTagCard";
 
 const ProposalDetail = () => {
   const { proposalid } = useParams();
@@ -45,8 +46,13 @@ const ProposalDetail = () => {
     if (state) {
       setLoading(true)
       toggleStatus_pdf()
+    }else {
+      setLoading(false)
+      setPopup(false)
     }
   };
+
+
 
   useEffect(() => {
     if (proposalid && rawCustomerData && rawProposalData && rawServiceData) {
@@ -108,73 +114,7 @@ let getIndex = serviceData.findIndex(service => service.uniqueid === selectedSer
       prev: serviceData[prevIndex]?.name || serviceData[serviceData.length - 1]?.name,
     });
   }, [serviceData, getIndex]);
-
-  const handleDownloadAgreement = () => {
-    const input = agreementRef.current;
-
-    if (input) {
-      html2canvas(input).then((canvas) => {
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "mm", "a4");
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-        pdf.save("agreement.pdf");
-      }).catch((error) => {
-        console.error("Error generating PDF:", error);
-      });
-    }
-  };
-
-  const toggleStatus_pdf = async () => {
-    try {
-        const input = agreementRef.current;
-
-        if (!input) {
-            throw new Error("Agreement element not found.");
-        }
-
-        // Generate the PDF using html2canvas and jsPDF
-        const canvas = await html2canvas(input);
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "mm", "a4");
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-
-        // Convert the PDF to a Blob
-        const pdfBlob = pdf.output("blob");
-
-        // Prepare FormData
-        const formData = new FormData();
-        formData.append('pdf', new File([pdfBlob], 'agreement.pdf', { type: 'application/pdf' }));
-        formData.append('status', 'active');
-        formData.append('proposalid', proposalid);
-        formData.append('date', new Date().toISOString());
-        formData.append('email', customerData?.personalDetails?.email);
-
-        // Send the FormData to the server
-        const response = await activeProposal(formData);
-
-        const dataObject = {
-          date: new Date(),
-          proposalid,
-          status: 'active'
-        }
-
-        if (response?.success) {
-          dispatch(hanldeStatusActive(true));
-          dispatch(handleToggleStatus(dataObject));
-          setLoading(false);
-          setPopup(false);
-          toast.success(`Your Proposal is Active and Added to Active Overview`);
-        }
-    } catch (error) {
-        console.error("Error sending agreement to server:", error.response?.data || error.message);
-    }
-};
+  
 
 
 const handleNextService = () => {
@@ -215,7 +155,7 @@ const handlePreviousService = () => {
 };
 
 const openLightbox = (index) => {
-  console.log(index)
+  // console.log(index)
   setCurrentImageIndex(index);
   setIsLightboxOpen(true);
 };
@@ -228,6 +168,137 @@ const navigateRoute = () => {
   toast.success("Proposal Saved Successfully!")
   navigate('/proposal')
 }
+
+const generatePDF = async (input) => {
+  if (!input) {
+    throw new Error("Agreement element not found.");
+  }
+
+  // Return the promise chain
+  return html2canvas(input, { scale: 2 }).then((canvas) => {
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    // Get the dimensions of the A4 page
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    // Define padding (in mm)
+    const paddingTop = 10; // Top padding
+    const paddingBottom = 10; // Bottom padding
+
+    // Available height for content after applying padding
+    const availableHeight = pdfHeight - paddingTop - paddingBottom;
+
+    // Scale the canvas dimensions to match the PDF width
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    const scaledHeight = (canvasHeight * pdfWidth) / canvasWidth;
+
+    // Number of pages required and current position in canvas
+    let yPosition = 0; // Initial Y position in the canvas
+    let currentPage = 1;
+
+    while (yPosition < scaledHeight) {
+      // Create a canvas for the current section
+      const sectionCanvas = document.createElement("canvas");
+      const sectionContext = sectionCanvas.getContext("2d");
+
+      sectionCanvas.width = canvasWidth;
+      sectionCanvas.height = (availableHeight * canvasWidth) / pdfWidth;
+
+      sectionContext.drawImage(
+        canvas,
+        0,
+        yPosition * (canvasWidth / pdfWidth),
+        canvasWidth,
+        sectionCanvas.height,
+        0,
+        0,
+        sectionCanvas.width,
+        sectionCanvas.height
+      );
+
+      const sectionImageData = sectionCanvas.toDataURL("image/png");
+
+      // Add the section image to the PDF with padding
+      pdf.addImage(sectionImageData, "PNG", 0, paddingTop, pdfWidth, availableHeight);
+
+      // Add a new page if more content remains
+      yPosition += sectionCanvas.height / (canvasWidth / pdfWidth);
+      if (yPosition < scaledHeight) {
+        pdf.addPage();
+        currentPage++;
+      }
+    }
+
+    return pdf; // Return the pdf object
+  }).catch((error) => {
+    console.error("Error generating PDF:", error);
+    throw error; // Re-throw the error to be caught by the calling function
+  });
+};
+
+const handleDownloadAgreement = async () => {
+  try {
+    const input = agreementRef.current;
+    const pdf = await generatePDF(input);
+    if (pdf) {
+      pdf.save("agreement.pdf");
+    }
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+  }
+};
+
+const toggleStatus_pdf = async () => {
+  try {
+    const input = agreementRef.current;
+    if (!input) {
+      throw new Error("Agreement reference not found");
+    }
+
+    // Wait for PDF generation
+    const pdf = await generatePDF(input);
+    if (!pdf) {
+      throw new Error("Failed to generate PDF");
+    }
+
+    // Create blob and wait for it
+    const pdfBlob = await pdf.output("blob");
+    if (!pdfBlob) {
+      throw new Error("Failed to create PDF blob");
+    }
+
+    // Prepare FormData with the confirmed blob
+    const formData = new FormData();
+    formData.append('pdf', new File([pdfBlob], 'agreement.pdf', { type: 'application/pdf' }));
+    formData.append('status', 'active');
+    formData.append('proposalid', proposalid);
+    formData.append('date', new Date().toISOString());
+    formData.append('email', customerData?.personalDetails?.email);
+
+    // Send the FormData to the server
+    const response = await activeProposal(formData);
+
+    if (response?.success) {
+      dispatch(hanldeStatusActive(true));
+      dispatch(handleToggleStatus({
+        date: new Date(),
+        proposalid,
+        status: 'active'
+      }));
+      setLoading(false);
+      setPopup(false);
+      toast.success(`Your Proposal is Active and Added to Active Overview`);
+    }
+  } catch (error) {
+    setLoading(false);
+    setPopup(false)
+    toast.error("Error processing agreement");
+    console.error("Error sending agreement to server:", error.response?.data || error.message);
+  }
+};
 
   return (
     <>
@@ -331,23 +402,8 @@ const navigateRoute = () => {
               <div className="pt-4">
                 <div className="box-cs">
                   <div className="row flex-col-rev gap-20">
-                    <div className="col-md-8">
-                      {/* <ProposalTagCard service={selectedServiceData} units={propertyData?.units}/> */}
-                        <ProposalTagCardv2 />
-                      <div className="pt-4">
-                        <ServiceViewCrad header={tabHeader} openLightbox={openLightbox} handlePreviousService={handlePreviousService} handleNextService={handleNextService} proposalid={proposalid} selectedServiceData={selectedServiceData} />
-                          {
-                            window.innerWidth < 767 && (
-                              <div className="mt-2">
-                                <NavLink to={`/service-detail/${proposalid}`} className={`btn-cs-2 bg-theme-2 txt-deco-none `}>
-                                  <i className="fa-regular fa-circle-plus" /> Add More Service
-                                </NavLink>
-                              </div>
-                            )
-                          }
-                      </div>
-                    </div>
-                    <div className="col-md-4 ">
+                  <div className="col-md-12 ">
+                      <div className="grid-cs gtc-3">
                       <div className="proposal-data ">
                         <table>
                           <tbody>
@@ -366,6 +422,12 @@ const navigateRoute = () => {
                               <td><p>:</p></td>
                               <td><p>{propertyData?.propertyName || "N/A"}</p></td>
                             </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="proposal-data ">
+                        <table>
+                          <tbody>
                             <tr>
                               <td><p>Contact Name</p></td>
                               <td><p>:</p></td>
@@ -384,7 +446,7 @@ const navigateRoute = () => {
                           </tbody>
                         </table>
                       </div>
-                      <div className="pt-4">
+                      <div className="">
                         <div className="service-overview-card desk-show">
                           <div><h4>Service Overview</h4></div>
                           <div>
@@ -398,7 +460,25 @@ const navigateRoute = () => {
                           </div>
                         </div>
                       </div>
+                      </div>
                     </div>
+                    <div className="col-md-12 pt-5">
+                      {/* <ProposalTagCard service={selectedServiceData} units={propertyData?.units}/> */}
+                        <ProposalTagCard service={selectedServiceData} allServices={serviceData} units={propertyData?.units} />
+                      <div className="pt-4">
+                        <ServiceViewCrad header={tabHeader} openLightbox={openLightbox} handlePreviousService={handlePreviousService} handleNextService={handleNextService} proposalid={proposalid} selectedServiceData={selectedServiceData} />
+                          {
+                            window.innerWidth < 767 && (
+                              <div className="mt-2">
+                                <NavLink to={`/service-detail/${proposalid}`} className={`btn-cs-2 bg-theme-2 txt-deco-none `}>
+                                  <i className="fa-regular fa-circle-plus" /> Add More Service
+                                </NavLink>
+                              </div>
+                            )
+                          }
+                      </div>
+                    </div>
+                    
                   </div>
                 </div>
               </div>
@@ -409,8 +489,9 @@ const navigateRoute = () => {
 
       {popup && <AgreedModal onConfirmation={confirmation} loading={loading} />}
         <div ref={agreementRef} style={{position : 'absolute', left : '-260%', top : '28%' }}>
-        <DownloadAgreement serviceData={serviceData} propertyData={propertyData} customerData={customerData} />
+        <DownloadAgreementV2 serviceData={serviceData} propertyData={propertyData} customerData={customerData} />
         </div>
+        {/* <DownloadAgreement serviceData={serviceData} propertyData={propertyData} customerData={customerData} /> */}
         <MoreDetailModal selectedServiceData={selectedServiceData} totalSqft={totalSqft} yearCost={perCleaning * selectedFrequency?.frequencyDigit} />
         {
           isLightboxOpen && (<LightBox closeLightbox={closeLightbox} initialIndex={currentImageIndex} selectedServiceData={selectedServiceData} />)

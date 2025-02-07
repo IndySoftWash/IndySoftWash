@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import MultiSelector from "./Helper/MultiSelector";
 import { useFormik } from "formik";
@@ -8,6 +8,7 @@ import { handleAddCustomerDetail, handleUpdateCustomer } from "../../../redux/Ad
 import { addCustomer, editCustomer } from "../../../services/CustomerService";
 import { generateUniqueId } from '../../../utils/UniqueIdGenerator'
 import Spinner from "../../shared/Loader/Spinner";
+import { toast } from "react-toastify";
 
 const AddCustomer = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const AddCustomer = () => {
 
   const customerDetail = useSelector(state => state.AdminDataSlice.customers)
 
-  const [image, setImage] = useState({ image1: "", image2: "" });
+  const [images, setImages] = useState([]);
   const [getPropertyData, setGetPropertyData] = useState([])
   const [loading, setLoading] = useState(false)
   const [createDate, setCreateDate] = useState(() => {
@@ -28,112 +29,171 @@ const AddCustomer = () => {
     return `${yyyy}-${mm}-${dd}`;
   });
 
-    const addCustomerForm = useFormik({
-      // validationSchema : validationSchema,
-        initialValues: {
-          uniqueid: '',
-        createDate,
-        customerType: "",
-        contactMethod: "",
-        personalDetails: {
-            firstName: "",
-            lastName: "",
-            email: "",
-            phone: "",
-            company: "",
-            status: ""
+  const fileInputRef = useRef(null);
+  const [removedImages, setRemovedImages] = useState([]);
+
+  useEffect(() => {
+    console.log(removedImages)
+  }, [removedImages]);
+
+
+  const addCustomerForm = useFormik({
+    // validationSchema : validationSchema,
+    initialValues: {
+      uniqueid: generateUniqueId(),
+      createDate,
+      customerType: "",
+      contactMethod: "",
+      source: "",
+      images: [],
+      personalDetails: {
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        company: "",
+        status: ""
+      },
+      property: [],
+      additionalContact: {
+        detail1: {
+          fullname: "",
+          title: "",
+          email: "",
+          phone: "",
         },
-        property: [],
-        additionalContact: {
+        detail2: {
+          fullname: "",
+          title: "",
+          email: "",
+          phone: "",
+        },
+      },
+      // additionalInfo: image,
+      additionalNotes: "",
+    },
+    onSubmit: async (formData) => {
+      setLoading(true);
+      
+      // Create a new FormData instance
+      const vformData = new FormData();
+      
+
+      if (customerid) {
+        // Append the form data
+        vformData.append('customerData', JSON.stringify(formData));
+        vformData.append('removedImages', JSON.stringify(removedImages));
+        
+        // Append new images
+        images.forEach(img => {
+          vformData.append('images', img.file);
+        });
+        // Handle edit case
+        const response = await editCustomer(vformData);
+        if (response.success) {
+          setLoading(false);
+          toast.success("Customer updated successfully");
+          dispatch(handleUpdateCustomer(response.result));
+          navigate(`/customer-detail/${response.result?.uniqueid}`);
+        } else {
+          toast.error("Customer updated failed");
+          setLoading(false);
+        }
+      } else {
+        // Handle add case
+        if (!formData.uniqueid) { 
+
+          formData.uniqueid = generateUniqueId();
+        }
+
+        // Append the form data
+        vformData.append('customerData', JSON.stringify(formData));
+        
+        // Append new images
+        images.forEach(img => {
+          vformData.append('images', img.file);
+        });
+
+        const response = await addCustomer(vformData);
+        if (response.success) {
+          setLoading(false);
+          toast.success("Customer added successfully");
+          dispatch(handleAddCustomerDetail(response.result));
+          navigate(`/customer-detail/${response.result?.uniqueid}`);
+        } else {
+          toast.error("Customer added failed");
+          setLoading(false);
+        }
+      }
+    },
+  });
+
+  // Fetch existing customer details and set form values
+  useEffect(() => {
+    if (customerid && customerDetail?.length >= 1) {
+      const filteredCustomerData = customerDetail?.find((value) => value.uniqueid === customerid);
+      if (filteredCustomerData) {
+        // Set form values using Formik's setValues method
+        addCustomerForm.setValues({
+          uniqueid: filteredCustomerData?.uniqueid || "",
+          createDate: filteredCustomerData?.createDate || createDate,
+          customerType: filteredCustomerData?.customerType || "",
+          contactMethod: filteredCustomerData?.contactMethod || "",
+          source: filteredCustomerData?.source || "",
+          images: filteredCustomerData?.images || [],
+          personalDetails: {
+            firstName: filteredCustomerData?.personalDetails?.firstName || "",
+            lastName: filteredCustomerData?.personalDetails?.lastName || "",
+            email: filteredCustomerData?.personalDetails?.email || "",
+            phone: filteredCustomerData?.personalDetails?.phone || "",
+            company: filteredCustomerData?.personalDetails?.company || "",
+          },
+          // property: filteredCustomerData?.property || [],
+          additionalContact: {
             detail1: {
-            fullname: "",
-            title: "",
-            email: "",
-            phone: "",
+              fullname: filteredCustomerData?.additionalContact?.detail1?.fullname || "",
+              title: filteredCustomerData?.additionalContact?.detail1?.title || "",
+              email: filteredCustomerData?.additionalContact?.detail1?.email || "",
+              phone: filteredCustomerData?.additionalContact?.detail1?.phone || "",
             },
             detail2: {
-            fullname: "",
-            title: "",
-            email: "",
-            phone: "",
+              fullname: filteredCustomerData?.additionalContact?.detail2?.fullname || "",
+              title: filteredCustomerData?.additionalContact?.detail2?.title || "",
+              email: filteredCustomerData?.additionalContact?.detail2?.email || "",
+              phone: filteredCustomerData?.additionalContact?.detail2?.phone || "",
             },
-        },
-        // additionalInfo: image,
-        additionalNotes: "",
-        },
-        onSubmit: async (formData) => {
-          setLoading(true)
-          if(customerid) {
-            const response = await editCustomer(formData)
-            if(response.success) {
-              setLoading(false)
-              dispatch(handleUpdateCustomer(response.result))
-              navigate(`/customer-detail/${response.result?.uniqueid}`); 
-            }
-          } else {
-            formData.uniqueid = generateUniqueId()
-            const response = await addCustomer(formData)
-            if(response.success) {
-                setLoading(false)
-                dispatch(handleAddCustomerDetail(response.result))
-                navigate(`/customer-detail/${response.result?.uniqueid}`); 
-              }
-            }            
-        },
-    });
-
-    // Fetch existing customer details and set form values
-useEffect(() => {
-  if (customerid && customerDetail?.length >= 1) {
-    const filteredCustomerData = customerDetail?.find((value) => value.uniqueid === customerid);
-    if (filteredCustomerData) {
-      // Set form values using Formik's setValues method
-      addCustomerForm.setValues({
-        uniqueid: filteredCustomerData?.uniqueid || "",
-        createDate: filteredCustomerData?.createDate || createDate,
-        customerType: filteredCustomerData?.customerType || "",
-        contactMethod: filteredCustomerData?.contactMethod || "",
-        personalDetails: {
-          firstName: filteredCustomerData?.personalDetails?.firstName || "",
-          lastName: filteredCustomerData?.personalDetails?.lastName || "",
-          email: filteredCustomerData?.personalDetails?.email || "",
-          phone: filteredCustomerData?.personalDetails?.phone || "",
-          company: filteredCustomerData?.personalDetails?.company || "",
-        },
-        // property: filteredCustomerData?.property || [],
-        additionalContact: {
-          detail1: {
-            fullname: filteredCustomerData?.additionalContact?.detail1?.fullname || "",
-            title: filteredCustomerData?.additionalContact?.detail1?.title || "",
-            email: filteredCustomerData?.additionalContact?.detail1?.email || "",
-            phone: filteredCustomerData?.additionalContact?.detail1?.phone || "",
           },
-          detail2: {
-            fullname: filteredCustomerData?.additionalContact?.detail2?.fullname || "",
-            title: filteredCustomerData?.additionalContact?.detail2?.title || "",
-            email: filteredCustomerData?.additionalContact?.detail2?.email || "",
-            phone: filteredCustomerData?.additionalContact?.detail2?.phone || "",
-          },
-        },
-        additionalNotes: filteredCustomerData?.additionalNotes || "",
-      });
-      setGetPropertyData(filteredCustomerData?.property || [])
+          additionalNotes: filteredCustomerData?.additionalNotes || "",
+        });
+        setGetPropertyData(filteredCustomerData?.property || [])
+      }
     }
-  }
-}, [customerid, customerDetail]);
-
-  const handleImageUpload = (event, type) => {
-    const file = event.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImage({ ...image, [type]: imageUrl });
-      addCustomerForm.setFieldValue(`additionalInfo.${type}`, imageUrl);
-    }
-  };
+  }, [customerid, customerDetail]);
 
   const handleMultiSelectorChange = (companyInfo) => {
     addCustomerForm.setFieldValue("property", companyInfo);
     // console.log(companyInfo)
+  };
+
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const newImages = files.map(file => ({
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+    setImages(prev => [...prev, ...newImages]);
+  };
+
+  const handleRemoveImage = (index) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeImageFromServer = (imageId) => {
+    setRemovedImages(prev => [...prev, imageId]);
+  };
+
+  const recoverImage = (imageId) => {
+    setRemovedImages(prev => prev.filter(id => id !== imageId));
   };
 
   return (
@@ -276,7 +336,7 @@ useEffect(() => {
                         Personal Details :
                       </h5>
                     </div>
-                    <div className="input-section gtc-3 my-2">
+                    <div className="input-section gtc-4 my-2">
                     {["firstName", "lastName", "email", "phone", "company"].map((field) => (
                       <div key={field} className="form-group ">
                         <input
@@ -312,6 +372,7 @@ useEffect(() => {
                       <option value="current customer">Current Customer</option>
                       <option value="past customer">Past Customer</option>
                     </select>
+                    <input type="text" name="source" placeholder="Source" value={addCustomerForm?.values?.source} onChange={(e) => {addCustomerForm.setFieldValue("source", e.target.value)}} id="" />
                   </div>
                   </div>
                 </div>
@@ -363,65 +424,6 @@ useEffect(() => {
                         </div>
                         <div className="top-cs pt-3 gtc-1">
                             <div className="grid-cs cs-align-end">
-                                {/* <div>
-                                    <div className="header">
-                                        <h5 className="font-1 fw-700 font-size-16">Additional info :</h5>
-                                    </div>
-                                    <div className="input-section mt-2 gtc-1">
-                                        <div className="upload-box" onClick={()=>document.getElementById('file-upload1').click()}>
-                                            {image.image1 ? (
-
-                                                <img src={image.image1} alt="Uploaded" />
-                                            
-                                                ) : (
-                                                <>
-                                                    <img 
-                                                    src="/assets/img/camera.svg"
-                                                    alt="Camera Icon"
-                                                    className="camera-icon"
-                                                    />
-                                                    <p>Upload Photos</p>
-                                                </>
-                                                )
-                                            }
-                                        </div>
-                                        <input
-                                            id="file-upload1"
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e)=>{handleImageUpload(e, 'image1')}}
-                                            className="file-input"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="input-section gtc-1">
-                                        <div className="upload-box" onClick={()=>document.getElementById('file-upload2').click()}>
-                                            {image.image2 ? (
-
-                                                <img src={image.image2} alt="Uploaded" />
-                                            
-                                                ) : (
-                                                <>
-                                                    <img
-                                                    src="/assets/img/camera.svg"
-                                                    alt="Camera Icon"
-                                                    className="camera-icon"
-                                                    />
-                                                    <p>Upload Blue Print</p>
-                                                </>
-                                                )
-                                            }
-                                        </div>
-                                        <input
-                                            id="file-upload2"
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e)=>{handleImageUpload(e, 'image2')}}
-                                            className="file-input"
-                                        />
-                                    </div>
-                                </div> */}
                             </div>
                             <div className="grid-cs gtc-1">
                                 <div className="header">
@@ -432,6 +434,64 @@ useEffect(() => {
                                     <textarea name="additionalNotes" value={addCustomerForm?.values?.additionalNotes} onChange={(e) => {addCustomerForm.setFieldValue("additionalNotes", e.target.value)}} rows={4} placeholder="Note" id=""></textarea>
                                 </div>
                             </div>
+                        </div>
+                        <div className="input-section pt-4 grid-cs gtc-4 width-100 cs-align-end">
+                          {/* Show existing server images */}
+                          {addCustomerForm.values.images?.map((img, index) => (
+                            <div 
+                              key={`server-${index}`} 
+                              className={`upload-box ${removedImages.includes(img.uniqueid) ? 'removed' : ''}`}
+                            >
+                              <img src={img.s3Url} alt="Service Image" className="preview-image" />
+                              {!removedImages.includes(img.uniqueid) ? (
+                                <button
+                                  type="button"
+                                  className="btn btn-danger btn-sm cs-absolute"
+                                  onClick={() => removeImageFromServer(img.uniqueid)}
+                                >
+                                  Remove
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="btn btn-danger btn-sm cs-absolute"
+                                  onClick={() => recoverImage(img.uniqueid)}
+                                >
+                                  Recover
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                          
+                          {/* Show newly uploaded images */}
+                          {images.map((img, index) => (
+                            <div key={`local-${index}`} className="upload-box">
+                              <img src={img.preview} alt="Preview" className="preview-image" />
+                              <button
+                                type="button"
+                                className="btn btn-danger btn-sm remove-btn"
+                                onClick={() => handleRemoveImage(index)}
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          ))}
+
+                          {/* Upload button */}
+                          <div className="upload-box" onClick={() => fileInputRef.current?.click()}>
+                            <img src="/assets/img/camera.svg" alt="Camera Icon" className="camera-icon" />
+                            <p>Upload Photos</p>
+                          </div>
+
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleImageUpload}
+                            className="file-input"
+                            style={{ display: 'none' }}
+                          />
                         </div>
                     </div>
                 </div>

@@ -21,9 +21,9 @@ const CompanyDetailRepeater = ({ data, customerId }) => {
                         </div> 
 
                         <div className="data py-4">
-                            <div><p className="font-3">Property Name</p> : <p className="font-3">{value.propertyName}</p></div>
-                            <div><p className="font-3">Billing Address</p> : <p className="font-3">{value.billingAddress}</p></div>
-                            <div><p className="font-3">Service Address</p> : <p className="font-3">{value.serviceAddress}</p></div>
+                            <div><p className="font-3 text-dark">Property Name :</p>  <p className="font-3">{value.propertyName}</p></div>
+                            <div><p className="font-3 text-dark">Billing Address :</p>  <p className="font-3">{value.billingAddress}</p></div>
+                            <div><p className="font-3 text-dark">Service Address :</p>  <p className="font-3">{value.serviceAddress}</p></div>
                             {/* <div><p className="font-3">Property Type</p> : {value.propertyType?.map(item=><p className="font-3">{item}</p>)}</div> */}
                             {/* <div><p className="font-3">Property Features</p> : {value.propertyFeatures?.map(item=><p className="font-3">{item}</p>)}</div> */}
                         </div>

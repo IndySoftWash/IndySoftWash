@@ -24,6 +24,12 @@ uniqueid: { type: String, default: '' },
 createDate: { type: Date, default: Date.now() },
 customerType: { type: String, default: '' },
 contactMethod: { type: String, default: '' },
+source: { type: String, default: '' },
+images: [{
+    uniqueid: { type: String, default: '' },
+    s3Url: { type: String, default: '' },
+    s3Key: { type: String, default: '' },
+}],
 personalDetails: {
     firstName: { type: String, default: '' },
     lastName: { type: String, default: '' },

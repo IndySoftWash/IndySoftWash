@@ -77,27 +77,16 @@ const ServiceDataSlice = createSlice({
             });
         },
         handleUpdateServices: (state, action) => {
-            const updatedServices = action.payload; // Array of updated service objects
-        
-            if (!Array.isArray(updatedServices)) {
+            if (!Array.isArray(action.payload)) {
                 console.error("Payload must be an array of services.");
                 return;
             }
-        
-            // Iterate through the updated services
-            updatedServices.forEach((updatedService) => {
-                const index = state.services.findIndex(
-                    (service) => service.uniqueid === updatedService.uniqueid
+            
+            state.services = state.services.map(existingService => {
+                const updatedService = action.payload.find(
+                    service => service.uniqueid === existingService.uniqueid
                 );
-        
-                if (index !== -1) {
-                    // Replace the old service object with the new one
-                    state.services[index] = { ...updatedService };
-                } else {
-                    console.warn(
-                        `Service with uniqueid ${updatedService.uniqueid} not found.`
-                    );
-                }
+                return updatedService || existingService;
             });
         },        
         handleToggleStatus: (state, action) => {
@@ -177,9 +166,25 @@ const ServiceDataSlice = createSlice({
         
             // Remove the services from the state
             state.services = state.services?.filter(service => !serviceid.includes(service.uniqueid));
-        }        
+        },        
+        handleUpdateServiceImage: (state, action) => {
+            const { serviceId, images } = action.payload;
+            state.services = state.services.map(service => {
+                if (service.uniqueid === serviceId) {
+                    // Initialize images array if it doesn't exist
+                    const currentImages = service.images || [];
+                    
+                    return {
+                        ...service,
+                        images: [...currentImages, ...images]
+                    };
+
+                }
+                return service;
+            });
+        }
     }
 })
 
 export default ServiceDataSlice.reducer;
-export const { resetState, handleAddProposal, hanldeStatusActive, handleDeleteProposal, handleDeleteCustomerData, handleToggleStatus, handleDeleteService, handleAddExtraService, handleUpdateServices, handleToggleActivePlan, handleGetProposal, handleAddServices, handleGetServices } = ServiceDataSlice.actions
+export const { resetState, handleAddProposal, handleUpdateServiceImage, hanldeStatusActive, handleDeleteProposal, handleDeleteCustomerData, handleToggleStatus, handleDeleteService, handleAddExtraService, handleUpdateServices, handleToggleActivePlan, handleGetProposal, handleAddServices, handleGetServices } = ServiceDataSlice.actions

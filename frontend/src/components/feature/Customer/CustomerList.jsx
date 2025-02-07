@@ -73,8 +73,12 @@ const CustomerList = () => {
       ?.toLowerCase()
       ?.includes(searchLower);
 
+    const matchesProperty = customer?.property?.some(item => 
+      item?.propertyName?.toLowerCase()?.includes(searchLower)
+    );
+
     // If searchQuery exists, ensure at least one match
-    if (searchQuery && !(matchesFirstName || matchesCompanyName || matchesStatus)) {
+    if (searchQuery && !(matchesFirstName || matchesCompanyName || matchesStatus || matchesProperty)) {
       return false;
     }
     return true;

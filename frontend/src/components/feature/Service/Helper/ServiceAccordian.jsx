@@ -1,12 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { frequencyDigit, frequencyDigitConverter } from '../../../../utils/frequencyDigitConverter'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';  // Import the default CSS for Toastify
 import { getPerCleaningCost } from "../../../../utils/ArithematicCalculation";
+import { formatNumberInput } from "../../../../utils/Formatter";
 
 
 const ServiceAccordian = ({ property, service, onChangeData, getServiceid }) => {
 
+  const fileInputRef = useRef([]);
+  const [image, setImage] = useState([]);
+  const [removeImage, setRemoveImage] = useState([]);
+  const [removedImages, setRemovedImages] = useState([]);
   const [servicesData, setServicesData] = useState(
     service?.reduce((acc, curr) => {
       acc[curr.uniqueid] = { ...curr }; // Initialize the state with each service data
@@ -156,10 +161,63 @@ const resetMonths = (serviceUniqueId) => {
 };
 
 useEffect(()=>{
-    onChangeData(servicesData)
-}, [servicesData])
+    onChangeData(servicesData, image, removeImage)
+}, [servicesData, image, removeImage])
 
-//   useEffect(()=>{console.log(servicesData)}, [servicesData])
+
+const handleImageUpload = (event, serviceId) => {
+  if (!event.target.files.length) return;
+
+  const files = Array.from(event.target.files);
+  const newImageFiles = files.map((file) => {
+    const fileExtension = file.name.split(".").pop();
+    const newFileName = `${serviceId}_${Date.now()}.${fileExtension}`;
+    const renamedFile = new File([file], newFileName, { type: file.type });
+    
+    return {
+      file: renamedFile,
+      preview: URL.createObjectURL(file),
+    };
+  });
+
+  setImage((prevImages) => ({
+    ...prevImages,
+    [serviceId]: [...(prevImages[serviceId] || []), ...newImageFiles],
+  }));
+
+  // Reset file input to allow re-upload of the same file
+  if (fileInputRef.current[serviceId]) {
+    fileInputRef.current[serviceId].value = "";
+  }
+};
+
+const handleRemoveImage = (serviceId, index) => {
+  setImage((prevImages) => {
+    if (!prevImages[serviceId]) return prevImages;
+
+    const updatedServiceImages = prevImages[serviceId].filter((_, i) => i !== index);
+
+    if (updatedServiceImages.length === 0) {
+      const { [serviceId]: _, ...rest } = prevImages;
+      return rest;
+    }
+
+    return {
+      ...prevImages,
+      [serviceId]: updatedServiceImages,
+    };
+  });
+};
+
+const removeImageFromServer = (serviceId, imageId) => {
+  setRemovedImages(prev => [...prev, imageId]);
+  setRemoveImage((prevRemoveImage) => [...prevRemoveImage, { serviceId, imageId }]);
+};
+
+const recoverImage = (serviceId, imageId) => {
+  setRemovedImages(prev => prev.filter(id => id !== imageId));
+  setRemoveImage(prev => prev.filter(item => item.imageId !== imageId));
+};
 
   return (
     <div className="accordion" id="servicesAccordion">
@@ -227,7 +285,7 @@ useEffect(()=>{
                         />
                         <input
                           className="width-100 input-"
-                          type="text"
+                          type="number"
                           placeholder="Quantity"
                           value={servicesData[value.uniqueid]?.quantity || ""}
                           onChange={(e) => handleInputChange(e, value.uniqueid, "quantity")}
@@ -235,7 +293,7 @@ useEffect(()=>{
                         />
                         <input
                           className="width-100 input-"
-                          type="text"
+                          type="number"
                           placeholder="SQFT"
                           value={servicesData[value.uniqueid]?.sqft || ""}
                           onChange={(e) => handleInputChange(e, value.uniqueid, "sqft")}
@@ -258,6 +316,7 @@ useEffect(()=>{
                         /> */}
                         <input
                           className="width-100 input-"
+                          onBlur={(e)=>formatNumberInput(e)}
                           type="number"
                           placeholder="$"
                           value={getFrequency?.price}
@@ -341,6 +400,71 @@ useEffect(()=>{
                         </div>
                       ))}
                     </div>
+                  </div>
+                  <div className="input-section grid-cs gtc-4 width-100 cs-align-end">
+                    {/* Show existing server images if any */}
+                    {value.images && value.images.map((img, index) => (
+                      <div 
+                        key={`server-${index}`} 
+                        className={`upload-box ${removedImages.includes(img.uniqueid) ? 'removed' : ''}`}
+                      >
+                        <img src={img.s3Url} alt="Service Image" />
+                        {!removedImages.includes(img.uniqueid) ? (
+                          <button
+                            type="button"
+                            className="btn btn-danger btn-sm cs-absolute"
+                            onClick={() => removeImageFromServer(value.uniqueid, img.uniqueid)}
+                          >
+                            Remove
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn btn-success btn-sm cs-absolute"
+                            onClick={() => recoverImage(value.uniqueid, img.uniqueid)}
+                          >
+                            Recover
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    
+                    {/* Show newly uploaded images if any */}
+                    {image[value.uniqueid]?.map((img, index) => (
+                      <div key={`local-${index}`} className="upload-box">
+                        <div className="image-preview-container">
+                          <div className="image-preview">
+                            <img src={img.preview} alt="Uploaded" />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          className="btn btn-danger btn-sm cs-absolute"
+                          onClick={() => handleRemoveImage(value.uniqueid, index)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+
+                    {/* Always show the upload box */}
+                    <div
+                      className="upload-box"
+                      onClick={() => fileInputRef.current[value.uniqueid]?.click()}
+                    >
+                      <img src="/assets/img/camera.svg" alt="Camera Icon" className="camera-icon" />
+                      <p>Upload Photos</p>
+                    </div>
+
+                    <input
+                      id={`file-upload-${value.uniqueid}`}
+                      ref={(el) => (fileInputRef.current[value.uniqueid] = el)}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handleImageUpload(e, value.uniqueid)}
+                      className="file-input"
+                    />
                   </div>
                 </div>
               </div>

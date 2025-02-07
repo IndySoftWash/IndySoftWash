@@ -5,9 +5,14 @@ import { handleAddCustomerDetail } from '../redux/AdminDataSlice'
 
 
 const addCustomer = async(formData) => {
-    const response = await axios.post(`${API_URL}/customer`, formData)
+    const response = await axios.post(`${API_URL}/customer`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
     return response.data
 }
+
 
 const getCustomer = async() => {
     const response = await axios.get(`${API_URL}/customer`)
@@ -25,8 +30,13 @@ const addProperty = async(formData) => {
 }
 
 const editCustomer = async(formData) => {
-    const response = await axios.put(`${API_URL}/customer`, formData)
+    const response = await axios.put(`${API_URL}/customer`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
     return response.data
 }
+
 
 export { addCustomer, getCustomer, deleteCustomer, addProperty, editCustomer }

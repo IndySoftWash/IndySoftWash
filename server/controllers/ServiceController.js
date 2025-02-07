@@ -10,39 +10,8 @@ const multerS3 = require('multer-s3');
 const multer = require('multer');
 const nodemailer = require('nodemailer')
 const fs = require('fs')
-const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const { deleteImageFromS3, s3Client } = require('../utils/aws')
 
-// AWS SDK Configuration
-const s3Client = new S3Client({
-    region: 'us-east-2',
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-});
-
-const deleteImageFromS3 = async (imageKey) => {
-    try {
-        if (!imageKey) {
-            console.error("Image key is missing");
-            return;
-        }
-
-        const deleteParams = {
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: imageKey,
-        };
-
-        // console.log(`Attempting to delete image: ${imageKey}`);
-        const command = new DeleteObjectCommand(deleteParams);
-        const result = await s3Client.send(command);
-
-        console.log(`Image ${imageKey} successfully deleted from S3`, result);
-    } catch (error) {
-        console.error(`Error deleting image ${imageKey} from S3:`, error);
-        throw new Error(`Failed to delete image ${imageKey} from S3`);
-    }
-};
 
 // Multer S3 storage configuration
 const storage = multerS3({
@@ -232,12 +201,29 @@ route.post('/', upload.any(), async (req, res) => {
     const rawData = req.body;
 
     try {
-        const serviceIds = [];
+        // First check if proposal already exists for this property
+        const customer = await customerModel.findOne({ uniqueid: rawData.customer });
+        if (!customer) {
+            return res.status(404).send({ message: 'Customer not found' });
+        }
 
-        // Parse the `serviceData` field from rawData
+        const property = customer.property.find(prop => prop.uniqueid === rawData.property);
+        if (!property) {
+            return res.status(404).send({ message: 'Property not found' });
+        }
+
+        // Check if proposal already exists
+        if (property?.proposal.includes(rawData.uniqueid) || property?.proposal?.length > 0) {
+            return res.status(400).send({ 
+                message: 'A proposal with this ID already exists for this property',
+                success: false 
+            });
+        }
+
+        const serviceIds = [];
         let serviceData = rawData.serviceData.map(item => JSON.parse(item));
 
-        // Process each service item
+        // Rest of the service processing code remains the same
         serviceData = await Promise.all(serviceData.map(async (serviceItem, i) => {
             const {
                 serviceItem: name,
@@ -286,7 +272,7 @@ route.post('/', upload.any(), async (req, res) => {
             return serviceClone;
         }));
 
-        // Create a proposalClone object
+        // Create and save proposal
         const proposalClone = {
             uniqueid: rawData.uniqueid,
             createDate: rawData.createDate,
@@ -295,31 +281,15 @@ route.post('/', upload.any(), async (req, res) => {
             service: serviceIds
         };
 
-        // Save the proposal to the database
         await proposalModel.create(proposalClone);
 
-        // Update the customer object
-        const customer = await customerModel.findOne({ uniqueid: rawData.customer });
-
-        if (!customer) {
-            return res.status(404).send({ message: 'Customer not found' });
-        }
-
-        const { email, firstName, lastName } = customer.personalDetails;
-
-        // Update the property with services and proposal
-        const property = customer.property.find(prop => prop.uniqueid === rawData.property);
-
-        if (property) {
-            property.services.push(...serviceIds);
-            property.proposal.push(rawData.uniqueid);
-        } else {
-            return res.status(404).send({ message: 'Property not found' });
-        }
-
+        // Update property with services and proposal
+        property.services.push(...serviceIds);
+        property.proposal.push(rawData.uniqueid);
         await customer.save();
 
-        // Nodemailer transporter setup
+        // Email sending code remains the same
+        const { email, firstName, lastName } = customer.personalDetails;
         const transporter = nodemailer.createTransport({
             host: "smtp-relay.brevo.com",
             port: 587,
@@ -486,30 +456,122 @@ route.put('/plan', async(req, res) => {
     res.status(200).send({success: true})
 })
 
-route.put('/', async (req, res) => {
-    const allServices = req.body;
+route.put('/', upload.any(), async (req, res) => {
+    const { allServices, removedImages } = req.body;
+    const parsedServices = JSON.parse(allServices);
 
-    if (!Array.isArray(allServices) || allServices.length === 0) {
+    if (!Array.isArray(parsedServices) || parsedServices.length === 0) {
         return res.status(400).json({ message: "Invalid input: Provide an array of services." });
     }
 
     try {
-        // Use Promise.all to handle multiple updates concurrently
-        const updatePromises = allServices.map(service => {
-            const { uniqueid, ...updatedFields } = service; // Extract uniqueid and the fields to update
+        
+        // Process new images and map them to services
+        const serviceImageMap = new Map();
+        if (req.files && req.files.length > 0) {
+            req.files.forEach(async (file) => {
+                // Extract serviceId from fieldname (assuming format: "serviceId_fieldname")
+                const serviceId = file.originalname.split('_')[0];
+                
+                const imageData = {
+                    uniqueid: uuidv4(),
+                    s3Url: file.location,
+                    s3Key: file.key,
+                };
+
+                if (!serviceImageMap.has(serviceId)) {
+                    serviceImageMap.set(serviceId, []);
+                }
+                serviceImageMap.get(serviceId).push(imageData);
+            });
+        }
+
+        // Update services with new data and images
+        const updatePromises = parsedServices.map(async service => {
+            const { uniqueid, ...updatedFields } = service;
+            
+            // If there are new images for this service, add them
+            if (serviceImageMap.has(uniqueid)) {
+                const currentService = await serviceModel.findOne({ uniqueid });
+                const existingImages = currentService?.images || [];
+                const newImages = serviceImageMap.get(uniqueid);
+                
+                return serviceModel.updateOne(
+                    { uniqueid },
+                    { 
+                        $set: {
+                            ...updatedFields,
+                            images: [...existingImages, ...newImages]
+                        }
+                    }
+                );
+            }
+
+            // If no new images, just update other fields
             return serviceModel.updateOne(
-                { uniqueid }, // Find the service by uniqueid
-                { $set: updatedFields } // Update the service with new fields
+                { uniqueid },
+                { $set: updatedFields }
             );
         });
 
-        // Wait for all updates to complete
-        const results = await Promise.all(updatePromises);
+        await Promise.all(updatePromises);
 
-        res.status(200).send({ message: "Services updated successfully.", success: true });
+        // Handle image deletions if any
+        if (removedImages) {
+            const imagesToRemove = JSON.parse(removedImages);
+        
+            for (const imageData of imagesToRemove) {
+                const { serviceId, imageId } = imageData;
+                
+                // Find the service first
+                const service = await serviceModel.findOne({ uniqueid: serviceId });
+        
+                if (service) {
+        
+                    // Find the specific image
+                    const imageToDelete = service.images.find(img => img.uniqueid === imageId);
+                    
+                    if (imageToDelete) {
+        
+                        // Delete from S3
+                        if (imageToDelete.s3Key) {
+                            await deleteImageFromS3(imageToDelete.s3Key);
+                        }
+        
+                        // Remove image from MongoDB
+                        const updateResult = await serviceModel.updateOne(
+                            { uniqueid: serviceId },
+                            { $pull: { images: { uniqueid: imageId } } }
+                        );
+        
+                    } else {
+                        console.warn(`Image not found in service: ${serviceId}`);
+                    }
+                } else {
+                    console.warn(`Service not found for ID: ${serviceId}`);
+                }
+            }
+        }
+
+        // Get array of uniqueids from parsedServices
+        const serviceIds = parsedServices.map(service => service.uniqueid);
+        
+        // Fetch only the services that match the provided uniqueids
+        const services = await serviceModel.find({ uniqueid: { $in: serviceIds } });
+
+
+        res.status(200).send({ 
+            message: "Services and images updated successfully.", 
+            success: true,
+            data: services 
+        });
+
     } catch (error) {
         console.error("Error updating services:", error);
-        res.status(500).send({ message: "Failed to update services.", error });
+        res.status(500).send({ 
+            message: "Failed to update services.", 
+            error: error.message 
+        });
     }
 });
 
@@ -803,8 +865,70 @@ route.post('/proposal/delete', async (req, res) => {
     }
 });
 
+route.put('/image', upload.any(), async (req, res) => {
+    const { serviceId, removedImages } = req.body;
+    try {
+        // Find the existing service
+        const service = await serviceModel.findOne({ uniqueid: serviceId });
+        if (!service) {
+            return res.status(404).send({ 
+                success: false, 
+                message: 'Service not found' 
+            });
+        }
+
+        // Handle image deletions if any
+        if (removedImages && Array.isArray(JSON.parse(removedImages))) {
+            const imagesToRemove = JSON.parse(removedImages);
+            
+            // Delete images from S3
+            for (const imageId of imagesToRemove) {
+                const imageToDelete = service.images.find(img => img.uniqueid === imageId);
+                if (imageToDelete?.s3Key) {
+                    await deleteImageFromS3(imageToDelete.s3Key);
+                }
+            }
+
+            // Remove deleted images from service.images array
+            service.images = service.images.filter(
+                img => !imagesToRemove.includes(img.uniqueid)
+            );
+        }
+
+        // Process new uploaded files
+        if (req.files && req.files.length > 0) {
+            const newImages = req.files.map(file => ({
+                uniqueid: uuidv4(),
+                s3Url: file.location, // S3 URL of the file
+                s3Key: file.key, // S3 Key for future deletion
+            }));
+
+            // Add new images to existing images array
+            service.images = [...service.images, ...newImages];
+        }
+
+        // Save updated service
+        await service.save();
+
+        res.status(200).send({
+            success: true,
+            message: 'Service images updated successfully',
+            data: service.images
+        });
+
+    } catch (error) {
+        console.error('Error updating service images:', error);
+        return res.status(500).send({ 
+            success: false, 
+            message: 'Internal server error',
+            error: error.message 
+        });
+    }
+});
+
 
 module.exports = route;
+
 
 
 {/* <p><a href="[Proposal Link]" target="_blank" style="color: #4CAF50; text-decoration: none;">View Proposal</a></p> 

@@ -33,7 +33,8 @@ const ServiceDetail = () => {
     const [updatedData, setUpdatedData] = useState([])
     const [deleteServiceId, setDeleteServiceId] = useState([])
     const [loading, setLoading] = useState(false)
-
+    const [removeImage, setRemoveImage] = useState([])
+    const [image, setImage] = useState([])
 
     useEffect(()=>{
         if(rawServiceData && rawProposalData) {
@@ -53,18 +54,39 @@ const ServiceDetail = () => {
         return Object.values(inputObject);
     }
 
+    const extractFiles = (data) => {
+        if (typeof data !== "object" || data === null) return [];
+      
+        return Object.values(data).flatMap((service) =>
+            Object.values(service).map(({ file }) => file)
+        );
+    };
 
-    const getServiceData = (data) => {
+
+    const getServiceData = (data, image, removeImage) => {
         const resultArray = convertObjectToArray(data);
-        // console.log(resultArray) 
+        setImage(extractFiles(image))
+        setRemoveImage(removeImage)
         setUpdatedData(resultArray)
+        // console.log(resultArray) 
+
     }
 
+
     const submitUpdatedServices = async() => {
+        const formData = new FormData()
+        formData.append('allServices', JSON.stringify(updatedData))
+        formData.append('removedImages', JSON.stringify(removeImage))
+        image?.forEach((img) => {
+            formData.append('image', img)
+        })
+
         setLoading(true)
-        const response = await updateServices(updatedData)
+        const response = await updateServices(formData)
+
         if(response.success) {
-            dispatch(handleUpdateServices(updatedData))
+
+            dispatch(handleUpdateServices(response.data))
             setLoading(false)
             navigate(`/proposal-detail/${proposalid}`)
         }

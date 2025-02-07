@@ -1,11 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import AddServiceImage from "../Modals/AddServiceImage";
 
-const ServiceViewCard = ({ handlePreviousService, openLightbox, handleNextService, header, proposalid, selectedServiceData }) => {
+const ServiceViewCard = ({ handlePreviousService, openLightbox, handleNextService, header, proposalid, selectedServiceData, serviceImg, setServiceImg }) => {
+
+
+
+  useEffect(() => {
+    if(serviceImg) {
+      setTimeout(() => {
+        setServiceImg(false)
+      }, 1000)
+    }
+  }, [serviceImg])
+
 
   return (
     <>
       <div className="services-view-card">
+
         <div className="header">
           <div className="d-flex justify-content-between w-100">
             {/* Previous Button */}
@@ -53,17 +66,24 @@ const ServiceViewCard = ({ handlePreviousService, openLightbox, handleNextServic
                 />
               )) : (
                 <>
-                <img src="/assets/img/no-image.jpg" alt="" />
-                <img src="/assets/img/no-image.jpg" alt="" />
-                <img src="/assets/img/no-image.jpg" alt="" />
+                  <div className="preview-image" onClick={() => setServiceImg(true)}>
+                    <i className="fa-regular font-3 fa-xl fa-plus"></i>
+                    <p className="font-3">Add Image</p>
+                  </div>
+                  <img src="/assets/img/no-image.jpg" alt="" />
+                  <img src="/assets/img/no-image.jpg" alt="" />
+
                 </>
               )
             }
           </div>
         </div>
       </div>
+
+
     </>
   );
 };
 
 export default ServiceViewCard;
+// /assets/img/no-image.jpg

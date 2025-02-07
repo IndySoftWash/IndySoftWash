@@ -63,9 +63,9 @@ const CustomerDetail = () => {
                                             </div> 
 
                                             <div className="data py-4">
-                                                <div><p className="font-3">Full Name</p> : <p className="font-3">{displayData?.personalDetails?.firstName}</p></div>
-                                                <div><p className="font-3">Phone No.</p> : <p className="font-3">{displayData?.personalDetails?.phone}</p></div>
-                                                <div><p className="font-3">Email Address</p> : <p className="font-3">{displayData?.personalDetails?.email}</p></div>
+                                                <div><p className="font-3 text-dark">Full Name :</p>  <p className="font-3">{displayData?.personalDetails?.firstName}</p></div>
+                                                <div><p className="font-3 text-dark"> Phone No. :</p>  <p className="font-3">{displayData?.personalDetails?.phone}</p></div>
+                                                <div><p className="font-3 text-dark">Email Address :</p>  <p className="font-3">{displayData?.personalDetails?.email}</p></div>
                                             </div>
                                         </div>
 
@@ -99,21 +99,21 @@ const CustomerDetail = () => {
                                             </div> 
                                         </div>
 
-                                        {/* <div className="content-layout mt-4">
+                                        <div className="content-layout mt-4">
                                             <div className="head-filters mob">
                                                 <div className="part-1 gtc-1">
                                                     <h4 className="font-1 fw-700">Images/blueprint Uploaded</h4>
                                                 </div>
                                             </div> 
 
-                                            <div className="data py-4">
-                                                <div>
-                                                    <img src={additionalInfo?.image1} alt="" />
-                                                    <img src={additionalInfo?.image2} alt="" />
-                                                </div>
+                                            <div className="grid-cs gtc-3 py-4">
+                                                {displayData?.images?.map((img, index) => (
+                                                    <div className="width-100" key={index}>
+                                                        <img className="width-100" src={img.s3Url} alt="" />
+                                                    </div>
+                                                ))}
                                             </div>
-
-                                        </div> */}
+                                        </div>
 
                                         <div className="content-layout mt-4">
                                             <div className="head-filters mob">
