@@ -29,8 +29,9 @@ const DeleteServiceModal = ({ serviceid, proposalid }) => {
             // Dispatch actions to update Redux state
             dispatch(handleDeleteService(dataObject));
             dispatch(handleDeleteServiceFromCustomer(dataObject));
+            const modalInstance = bootstrap.Modal.getInstance(document.getElementById('delete'));
+            modalInstance.hide();
             toast.success(`Service Deleted Successfully!`);
-            clsModal.current.click(); // Close the modal
             } else {
             // Handle API error
             console.error("Failed to delete service:", response.message || "Unknown error");
@@ -61,7 +62,7 @@ const DeleteServiceModal = ({ serviceid, proposalid }) => {
                         className="btn-close"
                         data-bs-dismiss="modal"
                         aria-label="Close"
-                        // ref={clsModal}
+                        ref={clsModal}
                         disabled={loading} // Disable button during loading
                         ></button>
                     </div>
