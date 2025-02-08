@@ -35,6 +35,7 @@ const ServiceDetail = () => {
     const [loading, setLoading] = useState(false)
     const [removeImage, setRemoveImage] = useState([])
     const [image, setImage] = useState([])
+    const [removedFrequency, setRemovedFrequency] = useState({})
 
     useEffect(()=>{
         if(rawServiceData && rawProposalData) {
@@ -63,20 +64,19 @@ const ServiceDetail = () => {
     };
 
 
-    const getServiceData = (data, image, removeImage) => {
+    const getServiceData = (data, image, removeImage, removedFrequency) => {
         const resultArray = convertObjectToArray(data);
         setImage(extractFiles(image))
         setRemoveImage(removeImage)
         setUpdatedData(resultArray)
-        // console.log(resultArray) 
-
+        setRemovedFrequency(removedFrequency)
     }
-
 
     const submitUpdatedServices = async() => {
         const formData = new FormData()
         formData.append('allServices', JSON.stringify(updatedData))
         formData.append('removedImages', JSON.stringify(removeImage))
+        formData.append('removedFrequency', JSON.stringify(removedFrequency))
         image?.forEach((img) => {
             formData.append('image', img)
         })
@@ -193,15 +193,16 @@ return (
                                         <table>
                                             <tbody>
                                                 <tr>
-                                                    <td><p>Apartments</p></td>
-                                                    <td><p>:</p></td>
+                                                    <td><p>Apartments :</p></td>
+                                                    {/* <td><p>:</p></td> */}
                                                     <td><span>{propertyData?.units} Units</span></td>
                                                 </tr>
                                                 <tr>
-                                                    <td><p>Company</p></td>
-                                                    <td><p>:</p></td>
+                                                    <td><p>Company :</p></td>
+                                                    {/* <td><p>:</p></td> */}
                                                     <td><span>{propertyData?.propertyName || "N/A"}</span></td>
                                                 </tr>
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -209,15 +210,17 @@ return (
                                         <table>
                                             <tbody>
                                                 <tr>
-                                                    <td><p>Contact Name</p></td>
-                                                    <td><p>:</p></td>
+                                                    <td><p>Contact Name :</p></td>
+                                                    {/* <td><p>:</p></td> */}
                                                     <td><span>{customerData?.personalDetails?.firstName}</span></td>
+
                                                 </tr>
                                                 <tr>
-                                                    <td><p>Property Address</p></td>
-                                                    <td><p>:</p></td>
+                                                    <td><p>Property Address :</p></td>
+                                                    {/* <td><p>:</p></td> */}
                                                     <td><span>{propertyData?.billingAddress || "N/A"}</span></td>
                                                 </tr>
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -225,13 +228,14 @@ return (
                                         <table>
                                             <tbody>
                                                 <tr>
-                                                    <td><p>Date</p></td>
-                                                    <td><p>:</p></td>
+                                                    <td><p>Date :</p></td>
+                                                    {/* <td><p>:</p></td> */}
                                                     <td><span>{formatDate(proposalData?.createDate)}</span></td>
                                                 </tr>
+
                                                 <tr>
-                                                    <td><p>Contact No</p></td>
-                                                    <td><p>:</p></td>
+                                                    <td><p>Contact No :</p></td>
+                                                    {/* <td><p>:</p></td> */}
                                                     <td><span>{customerData?.personalDetails?.phone}</span></td>
                                                 </tr>
                                             </tbody>

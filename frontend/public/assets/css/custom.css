@@ -634,6 +634,21 @@ li.active::after {
     border-color: #00B69B;
 }
 
+.checkbox-item.remove.active {
+    background-color: #ea0b0b;
+    /* Green */
+    color: white;
+    border-color: #ea0b0b;
+}
+
+.checkbox-item.remove .checkbox-icon {
+    margin-right: 0.5rem;
+}
+
+.checkbox-item.remove:hover {
+    border-color: #ea0b0b;
+}
+
 .flex-cs {
     display: flex;
     align-items: center;

@@ -33,21 +33,21 @@ const ServiceTagCard = ({ service, property }) => {
                     </div>
                     <div className="inner-layout">
                     <h4>Avg Cost per SQFT</h4>
-                    <p>${(totalCost / totalSqft)?.toFixed(2)}/SQFT</p>
+                    <p>${(totalCost / totalSqft)?.toFixed(2)?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/SQFT</p>
                     </div>
             </div>
 
             <div className="tag-card bg-theme-2 gap-cs-5">
                     <h4 className="font-1 text-center"><i class="fa-solid fa-hand-holding-circle-dollar" style={{color: "#fff"}} />  Investment</h4>
                     <div className="inner-layout">
-                    <p>${totalCost} Annually</p>
+                    <p>${totalCost?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Annually</p>
                     {/* <div className="form-check form-switch">
                         <input className="form-check-input cs-orange" type="checkbox" role="switch" id="flexSwitchCheckDefault" />
                     </div> */}
                     </div>
                     <div className="inner-layout">
                     <h4>Monthly Payment</h4>
-                    <p>${(totalCost / 12)?.toFixed(2)} PM</p>
+                    <p>${(totalCost / 12)?.toFixed(2)?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} PM</p>
                     </div>
             </div>
 

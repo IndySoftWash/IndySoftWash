@@ -107,7 +107,7 @@ const ProposalTagCard = ({service, units, allServices}) => {
                         </div>
                         <div className="">
                             <div className="inner-layout">
-                                <p>${perCleaning} per Cleaning</p>
+                                <p>${perCleaning?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per Cleaning</p>
                                 <div className="form-check form-switch">
                                 <input
                                     className={`form-check-input ${bgThemeCircleClass}`}
@@ -121,7 +121,7 @@ const ProposalTagCard = ({service, units, allServices}) => {
                             </div>
                             <div className="inner-layout">
                                 <h4>Per Door Investment</h4>
-                                <p>${unitPerMonth}/Unit Per Month</p>
+                                <p>${unitPerMonth?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/Unit Per Month</p>
                             </div>
                         </div>
                     </div>

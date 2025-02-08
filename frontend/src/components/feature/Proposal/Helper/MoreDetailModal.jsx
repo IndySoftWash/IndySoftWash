@@ -30,8 +30,8 @@ const MoreDetailModal = ({ selectedServiceData, yearCost, totalSqft }) => {
                                 </p>
                             </div>
                             <div className="grid-cs gtc-equal mob">
-                                <div className="tab-cs">{selectedServiceData?.sqft} <i class="fa-regular fa-xmark"></i> {selectedServiceData?.quantity} SQFT</div>
-                                <div className="tab-cs">${yearCost}/Yr</div>
+                                <div className="tab-cs">{selectedServiceData?.sqft} SQFT</div>
+                                <div className="tab-cs">${yearCost?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/Yr</div>
                             </div>
                         </div>
                 </div>
@@ -42,3 +42,4 @@ const MoreDetailModal = ({ selectedServiceData, yearCost, totalSqft }) => {
 }
 
 export default MoreDetailModal
+// <i class="fa-regular fa-xmark"></i> {selectedServiceData?.quantity}

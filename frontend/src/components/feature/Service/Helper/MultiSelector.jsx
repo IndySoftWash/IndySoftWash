@@ -394,7 +394,7 @@ const MultiSelector = ({ onDataChange }) => {
                                     onBlur={(e)=>formatNumberInput(e)}
                                     placeholder="$"
                                     name={freq.name}
-                                    value={freq.price}
+                                    value={freq.price === 0 ? null : freq.price}
                                     onChange={(e) => handleFrequencyChange(freq.name, e.target.value, index)}
                                     />
                                 </div>
@@ -411,7 +411,7 @@ const MultiSelector = ({ onDataChange }) => {
         }
         <div className="my-3">
             <button type="button" className="filter-btn bg-theme-2" onClick={addServices}>
-                <i className="fa-light fa-xl fa-circle-plus" style={{ color: "#ffffff" }} /> &nbsp; Add More Services
+                <i className="fa-light fa-xl fa-circle-plus" style={{ color: "#ffffff" }} /> &nbsp; Add Additional Service
             </button>
         </div>
     </>

@@ -457,7 +457,7 @@ route.put('/plan', async(req, res) => {
 })
 
 route.put('/', upload.any(), async (req, res) => {
-    const { allServices, removedImages } = req.body;
+    const { allServices, removedImages, removedFrequency } = req.body;
     const parsedServices = JSON.parse(allServices);
 
     if (!Array.isArray(parsedServices) || parsedServices.length === 0) {
@@ -465,14 +465,16 @@ route.put('/', upload.any(), async (req, res) => {
     }
 
     try {
-        
-        // Process new images and map them to services
+        // 1. First fetch all services in one query
+        const serviceIds = parsedServices.map(service => service.uniqueid);
+        const existingServices = await serviceModel.find({ uniqueid: { $in: serviceIds } });
+        const servicesMap = new Map(existingServices.map(service => [service.uniqueid, service]));
+
+        // 2. Process new images and map them to services
         const serviceImageMap = new Map();
-        if (req.files && req.files.length > 0) {
-            req.files.forEach(async (file) => {
-                // Extract serviceId from fieldname (assuming format: "serviceId_fieldname")
+        if (req.files?.length > 0) {
+            req.files.forEach(file => {
                 const serviceId = file.originalname.split('_')[0];
-                
                 const imageData = {
                     uniqueid: uuidv4(),
                     s3Url: file.location,
@@ -486,84 +488,97 @@ route.put('/', upload.any(), async (req, res) => {
             });
         }
 
-        // Update services with new data and images
-        const updatePromises = parsedServices.map(async service => {
+        // 3. Process removedImages
+        const imagesToRemoveMap = new Map();
+        if (removedImages) {
+            const imagesToRemove = JSON.parse(removedImages);
+            imagesToRemove.forEach(({ serviceId, imageId }) => {
+                if (!imagesToRemoveMap.has(serviceId)) {
+                    imagesToRemoveMap.set(serviceId, new Set());
+                }
+                imagesToRemoveMap.get(serviceId).add(imageId);
+            });
+        }
+
+        // Parse removedFrequency if it exists
+        const frequencyRemovalMap = new Map();
+        if (removedFrequency) {
+            const parsedRemovedFrequency = JSON.parse(removedFrequency);
+            Object.entries(parsedRemovedFrequency).forEach(([serviceId, frequencies]) => {
+                frequencyRemovalMap.set(serviceId, frequencies);
+            });
+        }
+
+        // 4. Prepare bulk operations
+        const bulkOperations = parsedServices.map(service => {
             const { uniqueid, ...updatedFields } = service;
+            const existingService = servicesMap.get(uniqueid);
             
-            // If there are new images for this service, add them
-            if (serviceImageMap.has(uniqueid)) {
-                const currentService = await serviceModel.findOne({ uniqueid });
-                const existingImages = currentService?.images || [];
-                const newImages = serviceImageMap.get(uniqueid);
-                
-                return serviceModel.updateOne(
-                    { uniqueid },
-                    { 
-                        $set: {
-                            ...updatedFields,
-                            images: [...existingImages, ...newImages]
+            if (!existingService) {
+                console.warn(`Service not found for ID: ${uniqueid}`);
+                return null;
+            }
+
+            // Handle image updates
+            let updatedImages = [...(existingService.images || [])];
+
+            // Remove deleted images
+            if (imagesToRemoveMap.has(uniqueid)) {
+                const imageIdsToRemove = imagesToRemoveMap.get(uniqueid);
+                updatedImages = updatedImages.filter(img => {
+                    if (imageIdsToRemove.has(img.uniqueid)) {
+                        // Queue S3 deletion
+                        if (img.s3Key) {
+                            deleteImageFromS3(img.s3Key).catch(err => 
+                                console.error(`Failed to delete S3 image: ${img.s3Key}`, err)
+                            );
                         }
+                        return false;
                     }
+                    return true;
+                });
+            }
+
+            // Add new images
+            if (serviceImageMap.has(uniqueid)) {
+                updatedImages = [...updatedImages, ...serviceImageMap.get(uniqueid)];
+            }
+
+            // Handle frequency removals
+            let updatedFrequency = [...(existingService.frequency || [])];
+            if (frequencyRemovalMap.has(uniqueid)) {
+                const frequenciesToRemove = frequencyRemovalMap.get(uniqueid);
+                updatedFrequency = updatedFrequency.filter(freq => 
+                    !frequenciesToRemove.includes(freq.name)
                 );
             }
 
-            // If no new images, just update other fields
-            return serviceModel.updateOne(
-                { uniqueid },
-                { $set: updatedFields }
-            );
-        });
-
-        await Promise.all(updatePromises);
-
-        // Handle image deletions if any
-        if (removedImages) {
-            const imagesToRemove = JSON.parse(removedImages);
-        
-            for (const imageData of imagesToRemove) {
-                const { serviceId, imageId } = imageData;
-                
-                // Find the service first
-                const service = await serviceModel.findOne({ uniqueid: serviceId });
-        
-                if (service) {
-        
-                    // Find the specific image
-                    const imageToDelete = service.images.find(img => img.uniqueid === imageId);
-                    
-                    if (imageToDelete) {
-        
-                        // Delete from S3
-                        if (imageToDelete.s3Key) {
-                            await deleteImageFromS3(imageToDelete.s3Key);
+            return {
+                updateOne: {
+                    filter: { uniqueid },
+                    update: {
+                        $set: {
+                            ...updatedFields,
+                            images: updatedImages,
+                            frequency: updatedFrequency
                         }
-        
-                        // Remove image from MongoDB
-                        const updateResult = await serviceModel.updateOne(
-                            { uniqueid: serviceId },
-                            { $pull: { images: { uniqueid: imageId } } }
-                        );
-        
-                    } else {
-                        console.warn(`Image not found in service: ${serviceId}`);
                     }
-                } else {
-                    console.warn(`Service not found for ID: ${serviceId}`);
                 }
-            }
+            };
+        }).filter(Boolean);
+
+        // 5. Execute bulk update in a single operation
+        if (bulkOperations.length > 0) {
+            await serviceModel.bulkWrite(bulkOperations);
         }
 
-        // Get array of uniqueids from parsedServices
-        const serviceIds = parsedServices.map(service => service.uniqueid);
-        
-        // Fetch only the services that match the provided uniqueids
-        const services = await serviceModel.find({ uniqueid: { $in: serviceIds } });
-
+        // 6. Fetch updated services
+        const updatedServices = await serviceModel.find({ uniqueid: { $in: serviceIds } });
 
         res.status(200).send({ 
             message: "Services and images updated successfully.", 
             success: true,
-            data: services 
+            data: updatedServices
         });
 
     } catch (error) {

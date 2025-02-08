@@ -336,7 +336,42 @@ const AddCustomer = () => {
                         Personal Details :
                       </h5>
                     </div>
-                    <div className="input-section gtc-4 my-2">
+                    <div className="input-section gtc-3 my-2">
+                    {["firstName", "email", "phone", "company"].map((field) => (
+                      <div key={field} className="form-group ">
+                        <input
+                          type={field === "phone" ? "number" : "text"}
+                          className={`form-control ${addCustomerForm.errors.personalDetails?.[field] && addCustomerForm.touched.personalDetails?.[field] && 'is-invalid'}`}
+                          placeholder={field === "firstName" ? 'Full Name' : field
+                            .split(/(?=[A-Z])/)
+                            .join(" ")
+                            .replace(/\b\w/g, (c) => c.toUpperCase())}
+                          value={addCustomerForm.values.personalDetails[field]}
+                          onChange={(e) =>
+                            addCustomerForm.setFieldValue(
+                              `personalDetails.${field}`,
+                              e.target.value
+                            )
+                          }
+                        />
+                        {/* Display error message for the specific field */}
+                        {addCustomerForm.errors.personalDetails?.[field] &&
+                          addCustomerForm.touched.personalDetails?.[field] && (
+                            <small className="text-danger">
+                              {addCustomerForm.errors.personalDetails[field]}
+                            </small>
+                          )}
+                      </div>
+                    ))}
+                    <select name="status" value={addCustomerForm?.values?.personalDetails?.status} onChange={(e) => {addCustomerForm.setFieldValue("personalDetails.status", e.target.value)}} id="">
+                      <option value="">Select Customer Status</option>
+                      <option value="lead">Lead</option>
+                      <option value="current customer">Current Customer</option>
+                      <option value="past customer">Past Customer</option>
+                    </select>
+                    <input type="text" name="source" placeholder="Source" value={addCustomerForm?.values?.source} onChange={(e) => {addCustomerForm.setFieldValue("source", e.target.value)}} id="" />
+                    </div>
+                    {/* <div className="input-section gtc-4 my-2">
                     {["firstName", "lastName", "email", "phone", "company"].map((field) => (
                       <div key={field} className="form-group ">
                         <input
@@ -357,7 +392,6 @@ const AddCustomer = () => {
                           //   addCustomerForm.setFieldTouched(`personalDetails.${field}`, true)
                           // }
                         />
-                        {/* Display error message for the specific field */}
                         {addCustomerForm.errors.personalDetails?.[field] &&
                           addCustomerForm.touched.personalDetails?.[field] && (
                             <small className="text-danger">
@@ -373,7 +407,7 @@ const AddCustomer = () => {
                       <option value="past customer">Past Customer</option>
                     </select>
                     <input type="text" name="source" placeholder="Source" value={addCustomerForm?.values?.source} onChange={(e) => {addCustomerForm.setFieldValue("source", e.target.value)}} id="" />
-                  </div>
+                    </div> */}
                   </div>
                 </div>
 

@@ -134,7 +134,7 @@ const MultiSelector = ({ onDataChange, paramData }) => {
                 {errors[index]?.propertyName && <div className="error text-danger">{errors[index].propertyName}</div>}
                 <input
                   type="text"
-                  placeholder="Property"
+                  placeholder="Management Company"
                   value={property.property}
                   onChange={(e) => setSelection(index, "property", e.target.value)}
                 />
@@ -233,7 +233,7 @@ const MultiSelector = ({ onDataChange, paramData }) => {
 
       <div className="my-3">
         <button type="button" className="filter-btn bg-theme-2" onClick={addProperty}>
-          <i className="fa-light fa-xl fa-circle-plus" style={{ color: "#ffffff" }} /> &nbsp; Add More Property
+          <i className="fa-light fa-xl fa-circle-plus" style={{ color: "#ffffff" }} /> &nbsp; Add Additional Property
         </button>
       </div>
     </>

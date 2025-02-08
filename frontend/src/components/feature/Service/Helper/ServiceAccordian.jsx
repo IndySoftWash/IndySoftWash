@@ -12,6 +12,7 @@ const ServiceAccordian = ({ property, service, onChangeData, getServiceid }) => 
   const [image, setImage] = useState([]);
   const [removeImage, setRemoveImage] = useState([]);
   const [removedImages, setRemovedImages] = useState([]);
+  const [removedFrequency, setRemovedFrequency] = useState({});
   const [servicesData, setServicesData] = useState(
     service?.reduce((acc, curr) => {
       acc[curr.uniqueid] = { ...curr }; // Initialize the state with each service data
@@ -73,6 +74,29 @@ const toggleMonthSelection = (month, serviceUniqueId) => {
         ...prevServicesData,
         [serviceUniqueId]: updatedService,
       };
+    });
+};
+
+const toggleFrequencySelection = (frequency, serviceUniqueId) => {
+    setRemovedFrequency((prevRemovedFrequency) => {
+        const currentServiceFrequencies = prevRemovedFrequency[serviceUniqueId] || [];
+        
+        if (currentServiceFrequencies.includes(frequency.name)) {
+            // Remove frequency if it exists
+            const updatedFrequencies = currentServiceFrequencies.filter(
+                item => item !== frequency.name
+            );
+            return {
+                ...prevRemovedFrequency,
+                [serviceUniqueId]: updatedFrequencies
+            };
+        } else {
+            // Add frequency if it doesn't exist
+            return {
+                ...prevRemovedFrequency,
+                [serviceUniqueId]: [...currentServiceFrequencies, frequency.name]
+            };
+        }
     });
 };
 
@@ -161,8 +185,8 @@ const resetMonths = (serviceUniqueId) => {
 };
 
 useEffect(()=>{
-    onChangeData(servicesData, image, removeImage)
-}, [servicesData, image, removeImage])
+    onChangeData(servicesData, image, removeImage, removedFrequency)
+}, [servicesData, image, removeImage, removedFrequency])
 
 
 const handleImageUpload = (event, serviceId) => {
@@ -365,6 +389,27 @@ const recoverImage = (serviceId, imageId) => {
                           />
                         </div>
                       </div>
+                    </div>
+                  </div>
+                  <div className="bottom-section width-100">
+                    <div className="head">
+                      <h4>Selected Frequencies: *</h4>
+                    </div>
+                    <div className="grid-cd width-100 input-section  gtc-6">
+                      {value?.frequency?.map((freq) => (
+                        <div
+                          key={freq}
+                          className={`checkbox-item remove ${
+                            removedFrequency[value.uniqueid]?.includes(freq.name) ? "active" : ""
+                          }`}
+                          onClick={() => toggleFrequencySelection(freq, value.uniqueid)}
+                        >
+                          {removedFrequency[value.uniqueid]?.includes(freq.name) && (
+                            <i className="fa-light fa-circle-xmark fa-lg" style={{ color: "#ffffff" }} />
+                          )}
+                          {freq.name}
+                        </div>
+                      ))}
                     </div>
                   </div>
                   <div className="bottom-section width-100">
