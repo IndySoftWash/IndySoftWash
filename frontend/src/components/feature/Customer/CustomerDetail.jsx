@@ -109,7 +109,7 @@ const CustomerDetail = () => {
                                             <div className="grid-cs gtc-3 py-4">
                                                 {displayData?.images?.map((img, index) => (
                                                     <div className="width-100" key={index}>
-                                                        <img className="width-100" src={img.s3Url} alt="" />
+                                                        <img className="width-100 br-11" src={img.s3Url} alt="" />
                                                     </div>
                                                 ))}
                                             </div>

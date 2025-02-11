@@ -62,6 +62,12 @@ const Sidebar = () => {
                         Schedule
                         </NavLink>
                     </li>
+                    <li className={active === '/calendar' && 'active'}>
+                        <NavLink onClick={closeSidebar} to="/calendar">
+                        <img src="assets/img/schedule.svg" />
+                        Calender
+                        </NavLink>
+                    </li>
                     <li className={active === '/active-overview' && 'active'}>
                         <NavLink className='message-tag' onClick={()=>{closeSidebar(), dispatch(hanldeStatusActive(false))}} to="/active-overview">
                         <img src="assets/img/active.svg" />

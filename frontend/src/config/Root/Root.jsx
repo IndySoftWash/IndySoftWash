@@ -14,6 +14,7 @@ import ServiceDetail from '../../components/feature/Service/ServiceDetail'
 import ServiceList from '../../components/feature/Service/ServiceList'
 import Setting from '../../components/feature/Settings/Setting'
 import DownloadAgreement from '../../components/shared/Agreement/DownloadAgreement'
+import Calendar from '../../components/feature/Schedule/Calender'
 
 const rootRoutes = [
     {
@@ -89,8 +90,8 @@ const rootRoutes = [
         element : <Profile />
     },
     {
-        path : 'test',
-        element : <DownloadAgreement />
+        path : 'calendar',
+        element : <Calendar />
     },
 ]
 

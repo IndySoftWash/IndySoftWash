@@ -1888,3 +1888,7 @@ li.active::after {
     bottom: 0;
     background: rgba(0, 0, 0, 0.2);
 }
+
+.br-11 {
+    border-radius: 11px !important;
+}

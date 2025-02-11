@@ -463,7 +463,7 @@ route.put('/', upload.any(), async (req, res) => {
     if (!Array.isArray(parsedServices) || parsedServices.length === 0) {
         return res.status(400).json({ message: "Invalid input: Provide an array of services." });
     }
-
+    // console.dir(parsedServices, { depth: null })
     try {
         // 1. First fetch all services in one query
         const serviceIds = parsedServices.map(service => service.uniqueid);
@@ -511,7 +511,7 @@ route.put('/', upload.any(), async (req, res) => {
 
         // 4. Prepare bulk operations
         const bulkOperations = parsedServices.map(service => {
-            const { uniqueid, ...updatedFields } = service;
+            const { uniqueid, frequency: newFrequency, ...updatedFields } = service;
             const existingService = servicesMap.get(uniqueid);
             
             if (!existingService) {
@@ -544,8 +544,10 @@ route.put('/', upload.any(), async (req, res) => {
                 updatedImages = [...updatedImages, ...serviceImageMap.get(uniqueid)];
             }
 
-            // Handle frequency removals
-            let updatedFrequency = [...(existingService.frequency || [])];
+            // Handle frequency updates - simply use the new frequency array
+            let updatedFrequency = newFrequency || [];
+            
+            // If there are frequencies to remove, filter them out
             if (frequencyRemovalMap.has(uniqueid)) {
                 const frequenciesToRemove = frequencyRemovalMap.get(uniqueid);
                 updatedFrequency = updatedFrequency.filter(freq => 
