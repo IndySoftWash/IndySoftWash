@@ -6,8 +6,9 @@ import { Provider } from 'react-redux'
 import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import AdminDataSlice from './redux/AdminDataSlice.js'
 import ServiceDataSlice from './redux/ServiceDataSlice.js'
+import EmployeeDataSlice from './redux/EmployeeDataSlice.js'
 
-const rootReducer = combineReducers({ AdminDataSlice, ServiceDataSlice });
+const rootReducer = combineReducers({ AdminDataSlice, ServiceDataSlice, EmployeeDataSlice });
 const store = configureStore({
   reducer : rootReducer
 });

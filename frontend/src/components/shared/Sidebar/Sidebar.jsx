@@ -75,6 +75,12 @@ const Sidebar = () => {
                         {itemActive && <div className="cs-status status-bg-active"></div>}
                         </NavLink>
                     </li>
+                    <li className={active === '/employees' && 'active'}>
+                        <NavLink onClick={closeSidebar} to="/employees">
+                        <img src="assets/img/employee.svg" />
+                        Employees
+                        </NavLink>
+                    </li>
                     </ul>
                     <ul className="other-menu">
                     <li className={active === '/setting' && 'active'}>

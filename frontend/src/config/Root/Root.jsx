@@ -15,6 +15,8 @@ import ServiceList from '../../components/feature/Service/ServiceList'
 import Setting from '../../components/feature/Settings/Setting'
 import DownloadAgreement from '../../components/shared/Agreement/DownloadAgreement'
 import Calendar from '../../components/feature/Schedule/Calender'
+import EmployeesList from '../../components/feature/Employees/EmployeesList'
+import AddEmployees from '../../components/feature/Employees/AddEmployees'
 
 const rootRoutes = [
     {
@@ -92,6 +94,18 @@ const rootRoutes = [
     {
         path : 'calendar',
         element : <Calendar />
+    },
+    {
+        path : 'employees',
+        element : <EmployeesList />
+    },
+    {
+        path : 'add-employee',
+        element : <AddEmployees />
+    },
+    {
+        path : 'add-employee/:id/:action',
+        element : <AddEmployees />
     },
 ]
 

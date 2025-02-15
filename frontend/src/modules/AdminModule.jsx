@@ -8,6 +8,8 @@ import { handleGetAdmin, handleGetCustomer } from '../redux/AdminDataSlice';
 import { getAdmin } from '../services/AdminService';
 import { getServiceAndProposal } from '../services/ProposalService';
 import { handleGetProposal, handleGetServices } from '../redux/ServiceDataSlice';
+import { handleGetEmployee } from '../redux/EmployeeDataSlice';
+import { getEmployees } from '../services/EmployeeService';
 
 const AdminModule = () => {
   const dispatch = useDispatch();
@@ -19,6 +21,14 @@ const AdminModule = () => {
     const response = await getCustomer();
     if (response.success) {
       dispatch(handleGetCustomer(response.result));
+    }
+  };
+
+  const fetchEmployees = async () => {
+    const response = await getEmployees();
+    console.log(response);
+    if (response.success) {
+      dispatch(handleGetEmployee(response.result));
     }
   };
 
@@ -46,7 +56,7 @@ const AdminModule = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true); // Show loader
-      await Promise.all([fetchAdmin(), fetchCustomers(), fetchServiceAndProposal()]);
+      await Promise.all([fetchAdmin(), fetchCustomers(), fetchServiceAndProposal(), fetchEmployees()]);
       setLoading(false); // Hide loader
     };
 
