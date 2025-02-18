@@ -146,7 +146,6 @@ const ServiceDataSlice = createSlice({
                     }
                 });
                 
-                console.log("i am property",property?.services)
                 // Filter proposals in state.proposal that are not in the extracted proposal IDs
                 state.proposal = state.proposal?.filter(
                     (proposal) => !allProposalIds.includes(proposal.uniqueid)
@@ -159,7 +158,6 @@ const ServiceDataSlice = createSlice({
         },
         handleDeleteProposal: (state, action) => {
             const { proposalid, serviceid } = action.payload;
-            console.log("i am servicedataslice", state.proposal?.filter(value => value !== proposalid))
         
             // Remove the proposal from the state
             state.proposal = state.proposal?.filter(value => value.uniqueid !== proposalid);
@@ -182,9 +180,27 @@ const ServiceDataSlice = createSlice({
                 }
                 return service;
             });
+        },
+        handleCreateWorkOrder: (state, action) => {
+            const { id, result } = action.payload;
+            state.services = state.services.map(service => {
+                if (service.uniqueid === id) {
+                    return { ...service, workOrder: result };
+                }
+                return service;
+            });
+        },
+        handleUpdateWorkOrder: (state, action) => {
+            const { id, result } = action.payload;
+            state.services = state.services.map(service => {
+                if (service.uniqueid === id) {
+                    return { ...service, workOrder: result };
+                }
+                return service;
+            });
         }
     }
 })
 
 export default ServiceDataSlice.reducer;
-export const { resetState, handleAddProposal, handleUpdateServiceImage, hanldeStatusActive, handleDeleteProposal, handleDeleteCustomerData, handleToggleStatus, handleDeleteService, handleAddExtraService, handleUpdateServices, handleToggleActivePlan, handleGetProposal, handleAddServices, handleGetServices } = ServiceDataSlice.actions
+export const { resetState, handleAddProposal, handleUpdateServiceImage, hanldeStatusActive, handleDeleteProposal, handleDeleteCustomerData, handleToggleStatus, handleDeleteService, handleAddExtraService, handleUpdateServices, handleToggleActivePlan, handleGetProposal, handleAddServices, handleGetServices, handleCreateWorkOrder, handleUpdateWorkOrder } = ServiceDataSlice.actions

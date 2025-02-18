@@ -33,7 +33,7 @@ const AddCustomer = () => {
   const [removedImages, setRemovedImages] = useState([]);
 
   useEffect(() => {
-    console.log(removedImages)
+    // console.log(removedImages)
   }, [removedImages]);
 
 

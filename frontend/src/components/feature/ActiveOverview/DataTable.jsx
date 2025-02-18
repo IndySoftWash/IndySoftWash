@@ -124,6 +124,10 @@ const DataTable = ({ title, onDelete, searchQuery, proposalDetail }) => {
                                         <td>
                                             <div className="table-profile gap-0">
                                                 <div>
+
+                                                    <NavLink to={`/proposal-detail/${value.uniqueid}/${"workorder"}`} className="btn">
+                                                        <i className="fa-solid fa-lg fa-calendar" style={{ color: "#00b69b" }} />
+                                                    </NavLink>
                                                     <NavLink to={`/proposal-detail/${value.uniqueid}`} className="btn">
                                                         <i className="fa-solid fa-lg fa-pen" style={{ color: "#00b69b" }} />
                                                     </NavLink>

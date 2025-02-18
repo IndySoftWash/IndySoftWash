@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import DataTable from "./Helper/DataTable";
 import { useSelector } from "react-redux";
-
+import DeleteEmployeeModal from "./Helper/DeleteEmployeeModal";
 const EmployeesList = () => {
 
   const employeeDetail = useSelector((state) => state.EmployeeDataSlice.employees);
@@ -79,6 +79,8 @@ const EmployeesList = () => {
             </div>
         </div>
         </section>
+
+        <DeleteEmployeeModal employeeData={selectedEmployee} />
     </>
   )
 }

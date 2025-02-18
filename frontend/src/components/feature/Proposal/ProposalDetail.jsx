@@ -20,7 +20,7 @@ import AddServiceImage from "./Modals/AddServiceImage";
 // import ProposalTagCardv2 from "./Helper/ProposalTagCardv2";
 
 const ProposalDetail = () => {
-  const { proposalid } = useParams();
+  const { proposalid, type } = useParams();
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const agreementRef = useRef(null)
@@ -295,7 +295,6 @@ const handlePreviousService = () => {
 };
 
 const openLightbox = (index) => {
-  console.log(index)
   setCurrentImageIndex(index);
   setIsLightboxOpen(true);
 };
@@ -487,9 +486,48 @@ const navigateRoute = () => {
                         </div>
                       </div>
                     </div>
+
                   </div>
                 </div>
               </div>
+
+              {
+                type && type === 'workorder' && (
+                  <div className="pt-4">
+                    <div className="box-cs">
+                      <div className="row">
+                        <div className="col-md-12">
+                          <div className="header my-3">
+                            <h4 className="font-1 fw-700">Work Orders List :-</h4>
+                          </div>
+                          <div className="grid-cs gtc-auto-max width-50">
+                            {
+                              serviceData?.map(value => (
+                                <>
+                                  <h4 className="font-1 font-size-18">{value?.name}</h4>
+                                  {value?.workOrder?.status === 'created' ? (
+                                    <NavLink to={`/work-order/${value?.uniqueid}/${"view"}`} className="filter-btn txt-deco-none bg-theme-1">
+                                      <i className="fa-light fa-circle-check fa-lg" style={{ color: "#ffffff" }} />
+                                      &nbsp; View Work Order
+                                    </NavLink>
+                                  ) : (
+                                    <NavLink to={`/work-order/${value?.uniqueid}/${"create"}`} className="filter-btn txt-deco-none bg-theme-7-outline">
+                                      <div className="flex-cs">
+                                        <input type="checkbox" className="cs-checkbox form-check-input mt-0" />
+                                        &nbsp; Create Work Order
+                                      </div>
+                                    </NavLink>
+                                  )}  
+                                </>
+                              ))
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
             </div>
           </div>
         </div>

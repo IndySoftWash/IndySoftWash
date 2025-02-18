@@ -233,7 +233,6 @@ const AdminDataSlice = createSlice({
         },                                       
         handleUpdateProfileImage: (state, action) => {
             const {profileImage} = action.payload;
-            console.log(action.payload)
             state.admin = {
                 ...state.admin, // Spread existing admin data
                 profileImage  // Update with new data from the payload

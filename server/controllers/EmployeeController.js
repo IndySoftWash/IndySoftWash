@@ -11,8 +11,6 @@ const multer = require('multer');
 const { s3Client, deleteImageFromS3 } = require('../utils/aws')
 
 
-route.use('/password', require('./subController/PasswordController'))
-
 // Multer S3 storage configuration
 const storage = multerS3({
     s3: s3Client,
@@ -169,8 +167,10 @@ route.put('/', upload.single('profileImage'), async(req, res) => {
                 s3Key: req.file.key,
             };
         } else {
-            newProfileImage = JSON.parse(profileImage)
+            newProfileImage = getEmployee?.profileImage
         }
+
+        // console.log(newProfileImage)
 
         // Prepare update fields
         const updateFields = {
@@ -183,12 +183,11 @@ route.put('/', upload.single('profileImage'), async(req, res) => {
             phone,
             email,
             uniqueid,
-            updatedAt: createdAt,
+            updateDate: createdAt,
+            createDate: getEmployee?.createDate,
         };
 
-        
-
-        await employeeData.updateOne({ _id: decoded.id }, { $set: updateFields });
+        await employeeData.updateOne({ uniqueid }, { $set: updateFields });
 
         return res.status(200).send({ success: true, message: 'Employee updated successfully', result: updateFields });
     } catch (error) {
@@ -201,14 +200,14 @@ route.put('/', upload.single('profileImage'), async(req, res) => {
     }
 })
 
-route.delete('/', async(req, res) => {
-    const {uniqueid} = req.body
-    const getEmployee = await employeeData.findOne({uniqueid})
+route.delete('/:id', async(req, res) => {
+    const {id} = req.params
+    const getEmployee = await employeeData.findOne({uniqueid : id})
     if(!getEmployee) {
         return res.status(400).send({ success: false, message: 'Employee not found' });
     }
     await deleteImageFromS3(getEmployee.profileImage.s3Key);    
-    await employeeData.deleteOne({uniqueid})
+    await employeeData.deleteOne({uniqueid : id})
     return res.status(200).send({ success: true, message: 'Employee deleted successfully' });
 })
 

@@ -10,7 +10,6 @@ const DataTable = ({ title, onDelete }) => {
     const rawServiceData = useSelector(state => state.AdminDataSlice.admin)
 
     useEffect(()=>{
-            console.log(rawServiceData?.customServices)
             setDisplayData(rawServiceData?.customServices)
     }, [rawServiceData])
 

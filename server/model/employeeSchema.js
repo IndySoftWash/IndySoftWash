@@ -7,6 +7,7 @@ const employeeSchema = new mongoose.Schema({
 
 uniqueid: { type: String, default: '' },
 createDate: { type: Date, default: Date.now() },
+updateDate: { type: Date, default: Date.now() },
 firstName: { type: String, default: '' },
 lastName: { type: String, default: '' },
 address: { type: String, default: '' },

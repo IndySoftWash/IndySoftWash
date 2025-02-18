@@ -17,6 +17,7 @@ import DownloadAgreement from '../../components/shared/Agreement/DownloadAgreeme
 import Calendar from '../../components/feature/Schedule/Calender'
 import EmployeesList from '../../components/feature/Employees/EmployeesList'
 import AddEmployees from '../../components/feature/Employees/AddEmployees'
+import WorkerOrder from '../../components/feature/WorkOrder/WorkerOrder'
 
 const rootRoutes = [
     {
@@ -68,6 +69,10 @@ const rootRoutes = [
         element : <ProposalDetail />
     },
     {
+        path : 'proposal-detail/:proposalid/:type',
+        element : <ProposalDetail />
+    },
+    {
         path : 'service-detail/:proposalid',
         element : <ServiceDetail />
     },
@@ -106,6 +111,10 @@ const rootRoutes = [
     {
         path : 'add-employee/:id/:action',
         element : <AddEmployees />
+    },
+    {
+        path : 'work-order/:id/:action',
+        element : <WorkerOrder />
     },
 ]
 

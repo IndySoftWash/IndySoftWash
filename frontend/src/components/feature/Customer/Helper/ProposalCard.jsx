@@ -57,7 +57,6 @@ const ProposalCard = ({  customerid }) => {
                 displayData && displayData.length >= 1 ? (
                     displayData.map((value, index) => {
                         const property = extractProperty(value.property); // Assuming extractProperty is defined
-                        console.log(property)
                         return (
                             <div className="head-filters mob pt-3" key={value.uniqueid}>
                                 <div className="part-1 gtc-1">

@@ -40,7 +40,6 @@ const Profile = () => {
         shirtSize: Yup.string().required("Please select a shirt size"),
         }),
         onSubmit: async(formData) => {
-        console.log("Form Data", formData);
         setLoading(true)
             const response = await updateProfile(formData)
             if(response.success) {

@@ -498,6 +498,10 @@ li.active::after {
     grid-template-columns: 1fr 1fr !important;
 }
 
+.gtc-2-1 {
+    grid-template-columns: 2fr 1fr !important;
+}
+
 .gtc-5 {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr !important;
 }
@@ -514,6 +518,10 @@ li.active::after {
     gap: 10px;
     align-items: center;
     grid-template-columns: 1fr 2fr 1fr;
+}
+
+.gtc-auto-max {
+    grid-template-columns: auto max-content !important;
 }
 
 .gtc-3 {
@@ -540,8 +548,16 @@ li.active::after {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr !important;
 }
 
+.gap-40 {
+    gap: 40px !important;
+}
+
 .width-max {
     width: max-content;
+}
+
+.width-50 {
+    width: 50% !important;
 }
 
 .box-cs .input-section input,
@@ -1480,6 +1496,11 @@ li.active::after {
 .input-disabled {
     cursor: no-drop;
     background-color: rgba(231, 231, 231, 0.37) !important;
+}
+
+.disabled {
+    cursor: no-drop;
+    opacity: 0.7;
 }
 
 .modal-dialog.width-800 {

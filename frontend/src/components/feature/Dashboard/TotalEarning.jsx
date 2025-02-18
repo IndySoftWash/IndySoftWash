@@ -10,7 +10,6 @@ const TotalEarning = ({ proposalData, serviceData }) => {
             const extractServiceIds = proposalData?.filter(value => value.status?.type === "active")?.map(value => value.service)?.flat()
             const extractServiceData = serviceData?.filter(value => extractServiceIds?.includes(value.uniqueid))
             const totalOverallAmount = getSumOfTotalCostYearly(extractServiceData)
-            console.log(totalOverallAmount)
             setTotalEarning(totalOverallAmount)
         }
     }, [proposalData, serviceData])

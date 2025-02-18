@@ -100,7 +100,6 @@ const AddProposal = () => {
 
   const handleMultiSelectorChange = (serviceData) => {
     proposalForm.setFieldValue("serviceData", serviceData);
-    console.log(serviceData)
   };
 
 

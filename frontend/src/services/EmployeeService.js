@@ -12,7 +12,7 @@ const getEmployeeById = async(id) => {
 }
 
 
-const login = async(formData) => {
+const EmployeeLogin = async(formData) => {
     const response = await axios.post(`${API_URL}/employee/login`, formData)
     return response.data
 }
@@ -35,8 +35,14 @@ const editEmployee = async(formData) => {
     return response.data
 }
 
+const deleteEmployee = async(id) => {
+    const response = await axios.delete(`${API_URL}/employee/${id}`)
+    return response.data
+}
 
 
 
 
-export { getEmployees, getEmployeeById, login, changePassword, addEmployee, editEmployee }
+
+
+export { getEmployees, getEmployeeById, EmployeeLogin, changePassword, addEmployee, editEmployee, deleteEmployee }

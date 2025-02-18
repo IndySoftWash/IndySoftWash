@@ -55,7 +55,6 @@ const Setting = () => {
     if (validate()) {
         setLoading(true)
         const response = await changePassword(formData)
-        console.log(response)
         if(response.success) {
             setLoading(false)
             setFormData({

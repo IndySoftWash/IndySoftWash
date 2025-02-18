@@ -18,6 +18,7 @@ const serviceSchema = new mongoose.Schema({
 const adminSchema = new mongoose.Schema({
 
 firstName: { type: String, default: '' },
+workOrderCount: { type: Number, default: 0 },
 lastName: { type: String, default: '' },
 address: { type: String, default: '' },
 shirtSize: { type: String, default: '' },

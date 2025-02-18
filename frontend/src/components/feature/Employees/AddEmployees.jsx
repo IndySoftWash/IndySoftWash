@@ -26,7 +26,7 @@ const AddEmployees = () => {
       const employee = employeeDetail.find((item) => item.uniqueid === id);
       if (employee) {
         addEmployeeForm.setValues(employee);
-        setProfileImage(employee.profileImage);
+        setProfileImage(employee.profileImage.s3Url);
       }
     }
   }, [id, employeeDetail, dispatch]);
@@ -134,7 +134,7 @@ const AddEmployees = () => {
                     <button
                       type="submit"
                       disabled={loading || action === 'view'}
-                      className="filter-btn txt-deco-none bg-theme-1"
+                      className={`filter-btn txt-deco-none bg-theme-1 ${action === 'view' ? 'disabled' : ''}`}
                     >
                       {loading ? (
                         <Spinner />
@@ -155,15 +155,20 @@ const AddEmployees = () => {
                   <div className="box-cs">
                   <div className="profile-image-container">
                   <label htmlFor="profileImage" className="profile-image-label">
-                    {addEmployeeForm?.values?.profileImage ? (
-                      <img src={addEmployeeForm?.values?.profileImage?.s3Url} alt="Profile" className="profile-image" />
-                    ) : 
-                    profileImage ? (
-                      <img src={URL.createObjectURL(profileImage)} alt="Profile" className="profile-image" />
-                    ) : 
-                    (
-                      <div className="default-profile-image">+</div>
-                    )}
+                    {
+                      profileImage ? (
+                        <img 
+                          src={typeof profileImage === 'string' 
+                            ? profileImage 
+                            : URL.createObjectURL(profileImage)} 
+                          alt="Profile" 
+                          className="profile-image" 
+                        />
+                      ) : 
+                      (
+                        <div className="default-profile-image">+</div>
+                      )
+                    }
                   </label>
                   <input
                     type="file"
