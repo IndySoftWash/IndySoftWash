@@ -3,7 +3,12 @@ import { API_URL } from '../utils/API_URL'
 
 
 const addCustomService = async(formData) => {
-    const response = await axios.post(`${API_URL}/service/custom`, formData)
+    const ID = localStorage.getItem('ddlj')
+    const response = await axios.post(`${API_URL}/service/custom`, formData, {
+        headers: {
+            'Authorization': ID
+        }
+    })
     return response.data
 }
 
@@ -54,12 +59,22 @@ const deleteService = async(formData) => {
 }
 
 const deleteCustomService = async(formData) => {
-    const response = await axios.delete(`${API_URL}/service/${formData}`)
+    const ID = localStorage.getItem('ddlj')
+    const response = await axios.delete(`${API_URL}/service/${formData}`, {
+        headers: {
+            'Authorization': ID
+        }
+    })
     return response.data
 }
 
 const updateCustomService = async(formData) => {
-    const response = await axios.put(`${API_URL}/service/custom`, formData)
+    const ID = localStorage.getItem('ddlj')
+    const response = await axios.put(`${API_URL}/service/custom`, formData, {
+        headers: {
+            'Authorization': ID
+        }
+    })
     return response.data
 }
 

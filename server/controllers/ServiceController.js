@@ -4,6 +4,7 @@ const customerModel = require('../model/customerSchema')
 const serviceModel = require('../model/serviceSchema')
 const proposalModel = require('../model/proposalSchema')
 require('dotenv').config();
+const jwt = require('jsonwebtoken')
 const path = require('path')
 const { v4: uuidv4 } = require('uuid');
 const multerS3 = require('multer-s3');
@@ -433,19 +434,62 @@ route.post('/extra', upload.any(), async (req, res) => {
 });
 
 route.post('/custom', async(req, res) => {
-    const customServices = req.body
-    await adminModel.updateOne({username: 'admin'},{$push: {customServices: customServices}})
-    res.status(200).send({ success: true, result: customServices })
-})
+    const id = req.headers.authorization;
+    if (!id) {
+        return res.status(401).send({ message: 'Unauthorized', success: false });
+    }
+
+    // Decode token
+    const decoded = jwt.verify(id, process.env.TOKEN_KEY);
+
+    // Ensure the decoded token has an _id
+    if (!decoded.id) {
+        return res.status(400).send({ message: 'Invalid token', success: false });
+    }
+
+    const customServices = req.body;
+
+    // Find the admin by ID using findOne()
+    const admin = await adminModel.findOne({ _id: decoded.id });
+
+    if (!admin) {
+        return res.status(404).send({ message: 'Admin not found', success: false });
+    }
+
+    // Update customServices if admin exists
+    const result = await adminModel.updateOne(
+        { _id: decoded.id },
+        { $push: { customServices: customServices } }
+    );
+
+
+    if (result.modifiedCount === 0) {
+        return res.status(400).send({ message: 'No changes made to custom services', success: false });
+    }
+
+    res.status(200).send({ success: true, result: customServices });
+});
 
 route.put('/custom', async (req, res) => {
     const customService = req.body;
     const { uniqueid } = customService;
 
+    const id = req.headers.authorization;
+    if(!id) {
+        return res.status(401).send({ message: 'Unauthorized', success: false });
+    }
+    
+    const decoded = jwt.verify(id, process.env.TOKEN_KEY);
+
+    if(!decoded.id) {
+        return res.status(400).send({ message: 'Invalid token', success: false });
+    }
+
+
     try {
         // Find and update the specific customService entry by uniqueid
         const result = await adminModel.updateOne(
-            { username: 'admin', 'customServices.uniqueid': uniqueid }, // Match admin and the customService with uniqueid
+            { _id: decoded.id, 'customServices.uniqueid': uniqueid }, // Match admin and the customService with uniqueid
             { $set: { 'customServices.$': customService } } // Update the matched customService
         );
 
@@ -738,11 +782,22 @@ route.post('/delete', async (req, res) => {
 
 route.delete('/:id', async (req, res) => {
     const serviceid = req.params.id;
+    const id = req.headers.authorization;
+
+    if(!id) {
+        return res.status(401).send({ message: 'Unauthorized', success: false });
+    }
+    
+    const decoded = jwt.verify(id, process.env.TOKEN_KEY);
+
+    if(!decoded.id) {
+        return res.status(400).send({ message: 'Invalid token', success: false });
+    }    
 
     try {
         // Use $pull to remove the customService that matches the uniqueid
         const result = await adminModel.updateOne(
-            { username: 'admin' }, // Filter to find the admin document
+            { _id: decoded.id }, // Filter to find the admin document
             { $pull: { customServices: { uniqueid: serviceid } } } // Remove service by uniqueid
         );
 

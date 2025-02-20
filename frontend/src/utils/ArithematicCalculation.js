@@ -31,6 +31,21 @@ const getSumOfTotalCostYearly = (data) => {
     }, 0);
 }
 
+const getTotalSqft = (service) => {
+    if (Array.isArray(service)) {
+        // Calculate totalSqft by summing up the sqft values multiplied by their quantities
+        const totalSqft = service.reduce(
+            (acc, curr) => {
+                const matchingFrequency = curr.frequency.find(freq => freq.name === curr.activePlan);
+                const frequencyMultiplier = matchingFrequency ? matchingFrequency.frequencyDigit : 1; // Default to 1 if no match
+                return acc + (parseFloat(curr.sqft) * (parseFloat(curr.quantity) || 1) * frequencyMultiplier);
+            },
+            0 // Initialize the accumulator as 0
+        );
+        return totalSqft;
+    }
+}
 
 
-export { getPerCleaningCost, getOverallCost, getSumOfTotalCostYearly }
+
+export { getPerCleaningCost, getOverallCost, getSumOfTotalCostYearly, getTotalSqft }

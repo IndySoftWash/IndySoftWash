@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getSumOfTotalCostYearly } from "../../../../utils/ArithematicCalculation";
+import { getSumOfTotalCostYearly, getTotalSqft } from "../../../../utils/ArithematicCalculation";
 
 
 const ServiceTagCard = ({ service, property }) => {
@@ -9,12 +9,8 @@ const ServiceTagCard = ({ service, property }) => {
 
     useEffect(() => {    
         if (Array.isArray(service)) {
-            // Calculate totalSqft by summing up the sqft values of all objects in the service array
-            const totalSqft = service.reduce(
-                (acc, curr) => acc + (parseFloat(curr.sqft) || 0),
-                0 // Initialize the accumulator as 0
-            );
-            setTotalSqft(totalSqft);
+            
+            setTotalSqft(getTotalSqft(service))
             setTotalCost(getSumOfTotalCostYearly(service))
         }
     }, [service]);    

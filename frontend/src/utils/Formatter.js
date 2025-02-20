@@ -1,5 +1,6 @@
 const formatNumberInput = (e) => {
   const value = e.target.value;
+  // console.log(value)
 
   if (value && parseFloat(value) < 0.01 && value && parseFloat(value) !== 0) {
     // If the value is smaller than 0.01, set it to 0.01
