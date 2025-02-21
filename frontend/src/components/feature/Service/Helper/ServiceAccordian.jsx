@@ -112,56 +112,113 @@ const handleInputChange = (e, serviceUniqueId, field) => {
     });
 };
 
+// const handleFrequencyChange = (e, frequency, serviceUniqueId, field) => {
+//     const { value } = e.target;
+
+//     console.log('value', value, 'frequency', frequency, 'serviceUniqueId', serviceUniqueId, 'field', field)
+
+//     // Check if the value is a string (frequency name) or number (price)
+//     const isString = isNaN(value);
+
+//     setServicesData((prevServicesData) => {
+//         const updatedService = { ...prevServicesData[serviceUniqueId] };
+
+//         if (isString) {
+//             // Handle the case when the value is a string (frequency name)
+//             const frequencyExists = updatedService.frequency?.find(
+//                 (item) => item.name === value
+//             );
+
+//             if (frequencyExists) {
+//                 // If it exists, set it as the activePlan
+//                 updatedService.activePlan = value;
+//             } else {
+//                 // If it doesn't exist, create a new entry in the frequency array
+//                 updatedService.frequency = [
+//                     ...(updatedService.frequency || []),
+//                     {
+//                         name: value,
+//                         price: 0,
+//                         frequencyDigit: frequencyDigitConverter[value] || 1, // Default to 1 if no converter value
+//                     },
+//                 ];
+//                 updatedService.activePlan = value;
+//             }
+//         } else {
+//             // Handle the case when the value is a number (price)
+//             updatedService.frequency = updatedService.frequency?.map((item) => {
+//                 if (item.name === frequency) {
+//                     return {
+//                         ...item,
+//                         [field]: parseFloat(value), // Convert the value to a number before storing
+//                     };
+//                 }
+//                 return item;
+//             });
+//         }
+
+//         // Return the updated services data
+//         return {
+//             ...prevServicesData,
+//             [serviceUniqueId]: updatedService,
+//         };
+//     });
+// };
+
 const handleFrequencyChange = (e, frequency, serviceUniqueId, field) => {
-    const { value } = e.target;
+  const { value } = e.target;
+  console.log('value', value, 'frequency', frequency, 'serviceUniqueId', serviceUniqueId, 'field', field);
 
-    // Check if the value is a string (frequency name) or number (price)
-    const isString = isNaN(value);
+  // Check if the value is a string (frequency name) or number (price)
+  const isString = isNaN(value);
 
-    setServicesData((prevServicesData) => {
-        const updatedService = { ...prevServicesData[serviceUniqueId] };
+  setServicesData((prevServicesData) => {
+      // Only update the service matching the serviceUniqueId
+      const updatedService = { ...prevServicesData[serviceUniqueId] };
+      if (!updatedService) return prevServicesData; // If no service is found with this unique ID, do nothing.
 
-        if (isString) {
-            // Handle the case when the value is a string (frequency name)
-            const frequencyExists = updatedService.frequency?.find(
-                (item) => item.name === value
-            );
+      if (isString) {
+          // Handle the case when the value is a string (frequency name)
+          const frequencyExists = updatedService.frequency?.find(
+              (item) => item.name === value
+          );
 
-            if (frequencyExists) {
-                // If it exists, set it as the activePlan
-                updatedService.activePlan = value;
-            } else {
-                // If it doesn't exist, create a new entry in the frequency array
-                updatedService.frequency = [
-                    ...(updatedService.frequency || []),
-                    {
-                        name: value,
-                        price: 0,
-                        frequencyDigit: frequencyDigitConverter[value] || 1, // Default to 1 if no converter value
-                    },
-                ];
-                updatedService.activePlan = value;
-            }
-        } else {
-            // Handle the case when the value is a number (price)
-            updatedService.frequency = updatedService.frequency?.map((item) => {
-                if (item.name === frequency) {
-                    return {
-                        ...item,
-                        [field]: parseFloat(value), // Convert the value to a number before storing
-                    };
-                }
-                return item;
-            });
-        }
+          if (frequencyExists) {
+              // If it exists, set it as the activePlan
+              updatedService.activePlan = value;
+          } else {
+              // If it doesn't exist, create a new entry in the frequency array
+              updatedService.frequency = [
+                  ...(updatedService.frequency || []),
+                  {
+                      name: value,
+                      price: 0,
+                      frequencyDigit: frequencyDigitConverter[value] || 1, // Default to 1 if no converter value
+                  },
+              ];
+              updatedService.activePlan = value;
+          }
+      } else {
+          // Handle the case when the value is a number (price)
+          updatedService.frequency = updatedService.frequency?.map((item) => {
+              if (item.name === frequency) {
+                  return {
+                      ...item,
+                      [field]: parseFloat(value), // Convert the value to a number before storing
+                  };
+              }
+              return item;
+          });
+      }
 
-        // Return the updated services data
-        return {
-            ...prevServicesData,
-            [serviceUniqueId]: updatedService,
-        };
-    });
+      // Return the updated services data with the updated service only
+      return {
+          ...prevServicesData,
+          [serviceUniqueId]: updatedService, // Only update the service with the unique ID
+      };
+  });
 };
+
 
 const resetMonths = (serviceUniqueId) => {
     setServicesData((prevServicesData) => {
@@ -186,6 +243,7 @@ const resetMonths = (serviceUniqueId) => {
 
 useEffect(()=>{
     onChangeData(servicesData, image, removeImage, removedFrequency)
+    // console.log(servicesData)
 }, [servicesData, image, removeImage, removedFrequency])
 
 
