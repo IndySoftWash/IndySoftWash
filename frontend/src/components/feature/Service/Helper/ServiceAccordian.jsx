@@ -399,6 +399,7 @@ const recoverImage = (serviceId, imageId) => {
                         <input
                           className="width-100 input-"
                           onBlur={(e)=>formatNumberInput(e)}
+                          onWheel={(e) => e.target.blur()}
                           type="number"
                           placeholder="$"
                           value={getFrequency?.price}
