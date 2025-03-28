@@ -11,37 +11,100 @@ const multerS3 = require('multer-s3');
 const multer = require('multer');
 const nodemailer = require('nodemailer')
 const fs = require('fs')
-const { deleteImageFromS3, s3Client } = require('../utils/aws')
+const { deleteImageFromS3, s3Client, multipartUpload } = require('../utils/aws')
 
 
-// Multer S3 storage configuration
-const storage = multerS3({
-    s3: s3Client,
-    bucket: process.env.AWS_BUCKET_NAME,
-    // acl: 'public-read',
-    metadata: (req, file, cb) => {
-        cb(null, { fieldName: file.fieldname });
-    },
-    key: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const extension = path.extname(file.originalname);
-        const newFilename = `service/${uniqueSuffix}${extension}`;
-        cb(null, newFilename); // S3 key (path within the bucket)
-    },
-});
+// // Multer S3 storage configuration
+// const storage = multerS3({
+//     s3: s3Client,
+//     bucket: process.env.AWS_BUCKET_NAME,
+//     // acl: 'public-read',
+//     metadata: (req, file, cb) => {
+//         cb(null, { fieldName: file.fieldname });
+//     },
+//     key: (req, file, cb) => {
+//         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+//         const extension = path.extname(file.originalname);
+//         const newFilename = `service/${uniqueSuffix}${extension}`;
+//         cb(null, newFilename); // S3 key (path within the bucket)
+//     },
+// });
 
 // Multer instance with limits and file type filter
+const storage = multer.memoryStorage();
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 * 1024 }, // Limit to 10MB
-    fileFilter: (req, file, cb) => {
-        cb(null, true);
-    },
+    limits: { fileSize: 10 * 1024 * 1024 }
 });
 
 const uploadPdf = multer({
     dest: "uploads/", // Temporary storage for uploaded files
 });
+
+// Helper function to send email
+const sendProposalEmail = async ({ email, firstName, lastName, proposalId }) => {
+    const transporter = nodemailer.createTransport({
+        host: "smtp-relay.brevo.com",
+        port: 587,
+        secure: false,
+        auth: {
+            user: process.env.BREVO_SMTP_MAIL,
+            pass: process.env.BREVO_SMTP_API_KEY
+        },
+        tls: { rejectUnauthorized: false }
+    });
+
+    const htmlContent = `
+        <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; }
+                    .container { padding: 20px; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; }
+                    .header { text-align: center; color: #4CAF50; }
+                    .content { margin-top: 20px; }
+                    .footer { margin-top: 20px; text-align: center; color: #777; font-size: 12px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h2 class="header">Your Proposal is Ready!</h2>
+                    <div class="content">
+                        <p>Dear <strong>${firstName} ${lastName}</strong>,</p>
+                        <p>We are excited to inform you that your proposal has been successfully created.</p>
+                        <p><strong>Proposal ID:</strong> ${proposalId}</p>
+                        <p>We look forward to assisting you further!</p>
+                    </div>
+                    <div class="footer">
+                        <p>Thank you for choosing Indy Soft Wash.</p>
+                    </div>
+                </div>
+            </body>
+        </html>`;
+
+    await transporter.sendMail({
+        from: `<${process.env.BREVO_SENDER_MAIL}>`,
+        to: email,
+        subject: `Your Proposal is Ready – Let's Move Forward!`,
+        html: htmlContent
+    });
+};
+
+// Helper function to cleanup uploaded files in case of error
+const cleanupUploadedFiles = async (serviceData) => {
+    try {
+        for (const service of serviceData) {
+            if (service.images) {
+                for (const image of service.images) {
+                    if (image.s3Key) {
+                        await deleteImageFromS3(image.s3Key);
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error cleaning up uploaded files:', error);
+    }
+};
 
 
 route.get('/', async(req, res) => {
@@ -237,19 +300,38 @@ route.post('/', upload.any(), async (req, res) => {
             } = serviceItem;
 
             // Extract and process images for the current service item
-            const serviceImages = req.files
-                .filter(file => file.fieldname.startsWith(`serviceData[${i}].additionalInfo`)) // Match all additionalInfo files for the current service
-                .map(file => {
-                    const matches = file.fieldname.match(/serviceData\[\d+\]\.additionalInfo\[(\d+)\]\.file/);
-                    const additionalInfoIndex = matches ? parseInt(matches[1], 10) : null;
+            // const serviceImages = req.files
+            //     .filter(file => file.fieldname.startsWith(`serviceData[${i}].additionalInfo`)) // Match all additionalInfo files for the current service
+            //     .map(file => {
+            //         const matches = file.fieldname.match(/serviceData\[\d+\]\.additionalInfo\[(\d+)\]\.file/);
+            //         const additionalInfoIndex = matches ? parseInt(matches[1], 10) : null;
 
+            //         return {
+            //             uniqueid: uuidv4(),
+            //             s3Url: file.location || file.path, // Use S3 location or local file path
+            //             s3Key: file.key || file.filename, // Use S3 key or local filename
+            //             additionalInfoIndex, // Optional: Include the index for additional grouping if needed
+            //         };
+            //     });
+
+            // Get files for this service
+            const serviceFiles = req.files.filter(file => 
+                file.fieldname.startsWith(`serviceData[${i}].additionalInfo`)
+            );
+
+            // Upload all images for this service using multipart upload
+            const serviceImages = await Promise.all(serviceFiles.map(async file => {
+                try {
+                    const uploadResult = await multipartUpload(file);
                     return {
-                        uniqueid: uuidv4(),
-                        s3Url: file.location || file.path, // Use S3 location or local file path
-                        s3Key: file.key || file.filename, // Use S3 key or local filename
-                        additionalInfoIndex, // Optional: Include the index for additional grouping if needed
+                        ...uploadResult,
+                        additionalInfoIndex: file.fieldname.match(/additionalInfo\[(\d+)\]/)?.[1]
                     };
-                });
+                } catch (error) {
+                    console.error(`Error uploading file for service ${serviceUniqueid}:`, error);
+                    throw error;
+                }
+            }));
 
             // Create the service clone object
             const serviceClone = {
@@ -357,14 +439,23 @@ route.post('/extra', upload.any(), async (req, res) => {
     const rawData = req.body;
     const { customerid, proposalid, propertyid, uniqueid } = rawData;
 
-    // Process uploaded files (images in additionalInfo)
-    const images = req.files.map(file => ({
+    try {
+        // Process uploaded files using multipart upload
+        const images = await Promise.all(req.files.map(async file => {
+            try {
+                const uploadResult = await multipartUpload(file, 'service');
+                return {
         uniqueid: uuidv4(),
-        s3Url: file.location, // Public URL of the file
-        s3Key: file.key, // S3 Key of the file
-    }));
+                    s3Url: uploadResult.s3Url,
+                    s3Key: uploadResult.s3Key
+                };
+            } catch (error) {
+                console.error(`Error uploading file:`, error);
+                throw error;
+            }
+        }));
 
-    // console.log(images)
+        console.log('Uploaded images:', images);
     
     // Construct serviceClone object
     const serviceClone = {
@@ -383,52 +474,75 @@ route.post('/extra', upload.any(), async (req, res) => {
         images
     };
 
-    try {
-        await serviceModel.create(serviceClone);
+        // Create service in database
+        const createdService = await serviceModel.create(serviceClone);
 
+        // Update proposal with new service
         const proposalUpdateResult = await proposalModel.updateOne(
             { uniqueid: proposalid },
             { $push: { service: uniqueid } }
         );
 
         if (proposalUpdateResult.modifiedCount === 0) {
+            // If proposal update fails, clean up uploaded images and throw error
+            await Promise.all(images.map(img => deleteImageFromS3(img.s3Key)));
+            await serviceModel.deleteOne({ uniqueid }); // Remove created service
             return res.status(404).send({ message: 'Proposal not found or update failed' });
         }
 
-        // 3. Find the customer by uniqueid
+        // Find and update customer
         const customer = await customerModel.findOne({ uniqueid: customerid });
-
         if (!customer) {
+            // Clean up if customer not found
+            await Promise.all(images.map(img => deleteImageFromS3(img.s3Key)));
+            await serviceModel.deleteOne({ uniqueid });
             return res.status(404).send({ message: 'Customer not found' });
         }
 
-        // 4. Find the property inside the customer object
+        // Find property
         const property = customer.property.find((prop) => prop.uniqueid === propertyid);
-
         if (!property) {
+            // Clean up if property not found
+            await Promise.all(images.map(img => deleteImageFromS3(img.s3Key)));
+            await serviceModel.deleteOne({ uniqueid });
             return res.status(404).send({ message: 'Property not found' });
         }
 
-        // 5. Add service and proposal to the property
+        // Update property services
         property.services = property.services || [];
         property.services.push(uniqueid);
 
-        // Save the updated customer object
+        // Save customer updates
         await customer.save();
 
-        // 6. Send a success response
         res.status(200).send({
             message: 'Service added successfully',
             success: true,
-            result: serviceClone,
+            result: createdService
         });
-    } catch (error) {
-        console.error('Error in adding service and proposal:', error);
 
-        // Return a more informative error message for debugging
+    } catch (error) {
+        console.error('Error in adding service:', error);
+
+        // Clean up any uploaded images if there was an error
+        if (req.files && req.files.length > 0) {
+            try {
+                const uploadedImages = await serviceModel.findOne({ uniqueid });
+                if (uploadedImages?.images) {
+                    await Promise.all(uploadedImages.images.map(img => 
+                        deleteImageFromS3(img.s3Key)
+                    ));
+                }
+                // Remove the service if it was created
+                await serviceModel.deleteOne({ uniqueid });
+            } catch (cleanupError) {
+                console.error('Error during cleanup:', cleanupError);
+            }
+        }
+
         res.status(500).send({
             message: 'An error occurred while adding the service and updating related data.',
-            error: error.message,
+            error: error.message
         });
     }
 });
@@ -523,19 +637,21 @@ route.put('/', upload.any(), async (req, res) => {
         // 2. Process new images and map them to services
         const serviceImageMap = new Map();
         if (req.files?.length > 0) {
-            req.files.forEach(file => {
+            // Process files in parallel using Promise.all
+            await Promise.all(req.files.map(async file => {
+                try {
                 const serviceId = file.originalname.split('_')[0];
-                const imageData = {
-                    uniqueid: uuidv4(),
-                    s3Url: file.location,
-                    s3Key: file.key,
-                };
+                    const uploadResult = await multipartUpload(file);
 
                 if (!serviceImageMap.has(serviceId)) {
                     serviceImageMap.set(serviceId, []);
                 }
-                serviceImageMap.get(serviceId).push(imageData);
-            });
+                    serviceImageMap.get(serviceId).push(uploadResult);
+                } catch (error) {
+                    console.error(`Error uploading file for service ${serviceId}:`, error);
+                    throw error;
+                }
+            }));
         }
 
         // 3. Process removedImages
@@ -973,12 +1089,25 @@ route.put('/image', upload.any(), async (req, res) => {
             );
         }
 
-        // Process new uploaded files
+        // Process new uploaded files using multipart upload
         if (req.files && req.files.length > 0) {
-            const newImages = req.files.map(file => ({
-                uniqueid: uuidv4(),
-                s3Url: file.location, // S3 URL of the file
-                s3Key: file.key, // S3 Key for future deletion
+            // Get files for this service
+            const serviceFiles = req.files.filter(file => 
+                file.fieldname === 'images'
+            );
+
+            // Upload all images using multipart upload
+            const newImages = await Promise.all(serviceFiles.map(async file => {
+                try {
+                    const uploadResult = await multipartUpload(file);
+                    return {
+                        ...uploadResult,
+                        additionalInfoIndex: file.originalname // Store original filename if needed
+                    };
+                } catch (error) {
+                    console.error(`Error uploading file for service ${serviceId}:`, error);
+                    throw error;
+                }
             }));
 
             // Add new images to existing images array
@@ -996,6 +1125,21 @@ route.put('/image', upload.any(), async (req, res) => {
 
     } catch (error) {
         console.error('Error updating service images:', error);
+        
+        // // If there's an error and new images were uploaded, try to clean them up
+        // if (service?.images) {
+        //     try {
+        //         const newImages = service.images.slice(-(req.files?.length || 0));
+        //         for (const image of newImages) {
+        //             if (image.s3Key) {
+        //                 await deleteImageFromS3(image.s3Key);
+        //             }
+        //         }
+        //     } catch (cleanupError) {
+        //         console.error('Error cleaning up uploaded files:', cleanupError);
+        //     }
+        // }
+
         return res.status(500).send({ 
             success: false, 
             message: 'Internal server error',

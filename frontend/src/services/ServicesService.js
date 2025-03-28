@@ -52,7 +52,6 @@ const updateServices = async(formData) => {
     return response.data
 } 
 
-
 const deleteService = async(formData) => {
     const response = await axios.post(`${API_URL}/service/delete`, formData)
     return response.data
@@ -78,14 +77,24 @@ const updateCustomService = async(formData) => {
     return response.data
 }
 
-const updateServiceImage = async(formData) => {
-    const response = await axios.put(`${API_URL}/service/image`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    })
-    return response.data
-}
+const updateServiceImage = async (formData, options = {}) => {
+    try {
+        const response = await axios.put(
+            `${API_URL}/service/image`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                ...options
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error updating service image:', error);
+        throw error;
+    }
+};
 
 
 

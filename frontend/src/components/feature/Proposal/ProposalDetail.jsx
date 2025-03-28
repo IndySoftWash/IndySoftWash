@@ -481,7 +481,7 @@ const navigateRoute = () => {
                           </div>
                           <div className="grid-cs gtc-equal mob">
                             <div className="tab-cs">{selectedServiceData?.sqft} SQFT</div>
-                            <div className="tab-cs">${perCleaning * selectedFrequency?.frequencyDigit?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/Yr</div>
+                            <div className="tab-cs">${(perCleaning * selectedFrequency?.frequencyDigit)?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/Yr</div>
                           </div>
                         </div>
                       </div>

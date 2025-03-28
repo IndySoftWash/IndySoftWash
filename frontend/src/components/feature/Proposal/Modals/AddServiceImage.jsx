@@ -28,27 +28,40 @@ const AddServiceImage = ({serviceId, serviceImg}) => {
         setImage((prevImages) => prevImages.filter((_, i) => i !== index));
     };
 
-    const handleSave = async() => {
-        setLoading(true)
-        const formData = new FormData();
-        formData.append('serviceId', serviceId);
-        
-        // Loop through each image and append the actual file
-        image.forEach((img, index) => {
-            formData.append('images', img.file);
-        });
+    const handleSave = async () => {
+        setLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append('serviceId', serviceId);
+            
+            // Loop through each image and append the actual file
+            image.forEach((img, index) => {
+                formData.append('images', img.file);
+            });
 
-        const response = await updateServiceImage(formData)
-        if(response.success){
-            setImage([])
-            dispatch(handleUpdateServiceImage({serviceId, images: response.data}))
-            setLoading(false)
-            toast.success("Image added successfully")
-            closeModal.current?.click()
+            const response = await updateServiceImage(formData, {
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round(
+                        (progressEvent.loaded * 100) / progressEvent.total
+                    );
+                    // You can add a progress state and update UI
+                    console.log('Upload Progress:', percentCompleted);
+                }
+            });
 
+            if (response.success) {
+                setImage([]);
+                dispatch(handleUpdateServiceImage({serviceId, images: response.data}));
+                toast.success("Images uploaded successfully");
+                closeModal.current?.click();
+            }
+        } catch (error) {
+            console.error('Error uploading images:', error);
+            toast.error("Failed to upload images. Please try again.");
+        } finally {
+            setLoading(false);
         }
-
-    }
+    };
 
 
   return (
