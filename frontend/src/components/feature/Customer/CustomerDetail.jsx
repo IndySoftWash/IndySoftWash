@@ -42,7 +42,7 @@ const CustomerDetail = () => {
                             </div>
                             <div className="part-1  gtc-3">
                                 <button onClick={()=>navigate(`/add-customer/${id}`)} className="filter-btn txt-deco-none bg-theme-7"><i className="fa-solid  fa-sm fa-pen" style={{ color: "#fff" }} /> &nbsp; Edit {displayData?.personalDetails?.firstName}</button>
-                                <button data-bs-toggle="modal" data-bs-target="#addProperty" className="filter-btn txt-deco-none bg-theme-3"><i class="fa-light fa-lg fa-circle-plus" style={{ color: "#ffffff" }} /> &nbsp; Add Property</button>
+                                <button data-bs-toggle="modal" data-bs-target="#addProperty" className="filter-btn txt-deco-none bg-theme-3"><i class="fa-light fa-lg fa-circle-plus" style={{ color: "#ffffff" }} /> &nbsp; Add More Property</button>
                                 {/* <button onClick={()=>setAddProposalPopup({state: true, type: 'edit'})} className="filter-btn txt-deco-none bg-theme-2"><i className="fa-solid  fa-sm fa-pen" style={{ color: "#fff" }} /> &nbsp; Edit Proposal</button> */}
                                 <button onClick={()=>setAddProposalPopup({state: true, type: 'create'})} className="filter-btn txt-deco-none bg-theme-1"><i class="fa-light fa-lg fa-circle-plus" style={{ color: "#ffffff" }} /> &nbsp; Create Proposal</button>
                             </div>
@@ -80,15 +80,15 @@ const CustomerDetail = () => {
                                             </div> 
 
                                             <div className="data cs-border-bottom py-4">
-                                                <div><p className="font-3">{displayData?.additionalContact?.detail1?.fullname}</p></div>
-                                                <div><p className="font-3">{displayData?.additionalContact?.detail1?.phone}</p></div>
-                                                <div><p className="font-3">{displayData?.additionalContact?.detail1?.email}</p></div>
+                                                <div><p className="font-3 text-dark">Full Name :</p> <p className="font-3">{displayData?.additionalContact?.detail1?.fullname || 'N/A'}</p></div>
+                                                <div><p className="font-3 text-dark">Phone :</p> <p className="font-3">{displayData?.additionalContact?.detail1?.phone || 'N/A'}</p></div>
+                                                <div><p className="font-3 text-dark">Email :</p> <p className="font-3">{displayData?.additionalContact?.detail1?.email || 'N/A'}</p></div>
                                             </div>
 
                                             <div className="data py-4">
-                                                <div><p className="font-3">{displayData?.additionalContact?.detail2?.fullname}</p></div>
-                                                <div><p className="font-3">{displayData?.additionalContact?.detail2?.phone}</p></div>
-                                                <div><p className="font-3">{displayData?.additionalContact?.detail2?.email}</p></div>
+                                                <div><p className="font-3 text-dark">Full Name :</p> <p className="font-3">{displayData?.additionalContact?.detail2?.fullname || 'N/A'}</p></div>
+                                                <div><p className="font-3 text-dark">Phone :</p> <p className="font-3">{displayData?.additionalContact?.detail2?.phone || 'N/A'}</p></div>
+                                                <div><p className="font-3 text-dark">Email :</p> <p className="font-3">{displayData?.additionalContact?.detail2?.email || 'N/A'}</p></div>
                                             </div>
 
                                             <div className="head-filters mob pt-4">

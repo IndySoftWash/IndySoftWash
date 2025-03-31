@@ -44,7 +44,7 @@ const CreateProposalModal = ({ property, onConfirmation, customerid, type }) => 
           </div>
 
           {/* Body */}
-          <div className="body">
+          <div className="body box-cs hide">
             {displayData?.length >= 1  ? (
               displayData
                 .map((value, index) => (
@@ -53,7 +53,7 @@ const CreateProposalModal = ({ property, onConfirmation, customerid, type }) => 
                     <p>{value?.propertyName}</p>
 
                     {/* Radio Button */}
-                    <div className="form-check">
+                    <div className="input-section gtc-1">
                       <input
                         className="form-check-input"
                         type="radio"

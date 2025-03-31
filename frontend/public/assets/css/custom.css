@@ -4,10 +4,11 @@
     box-sizing: border-box;
 }
 
-.form-check-input:checked {
+
+/* .form-check-input:checked {
     background-color: #979797 !important;
     border-color: #979797;
-}
+} */
 
 ::-webkit-scrollbar {
     width: 10px;
@@ -334,6 +335,12 @@ li.active::after {
     filter: drop-shadow(6px 6px 54px rgba(0, 0, 0, 0.05));
     padding: 20px;
     border-radius: 12px;
+    &.hide {
+        background-color: transparent;
+        filter: none;
+        border-radius: 0px;
+        padding: 0px;
+    }
 }
 
 .box-cs .layout {
@@ -511,6 +518,30 @@ li.active::after {
     gap: 10px;
     align-items: center;
     grid-template-columns: 1fr 1fr 1fr 1fr;
+    .form-check-input {
+        position: relative;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ccc;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        background-color: #fff;
+    }
+    .form-check-input:checked {
+        border-color: #979797;
+        background-color: #fff;
+    }
+    .form-check-input:checked::after {
+        content: '\2713';
+        position: absolute;
+        left: 4px;
+        top: 0px;
+        font-size: 20px;
+        color: #979797;
+        font-weight: bold;
+        line-height: 20px;
+    }
 }
 
 .box-cs .top-cs {
@@ -1126,7 +1157,7 @@ li.active::after {
 
 .form-check-input:focus {
     outline: none !important;
-    border-color: transparent !important;
+    /* border-color: transparent !important; */
     box-shadow: none !important;
 }
 

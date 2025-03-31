@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { generateUniqueId } from "../../../../utils/UniqueIdGenerator";
+import { formatNumberThousand } from "../../../../utils/Formatter";
 
 const MultiSelector = ({ onDataChange, paramData }) => {
   const [properties, setProperties] = useState([
@@ -140,8 +141,9 @@ const MultiSelector = ({ onDataChange, paramData }) => {
                 />
                 {errors[index]?.property && <div className="error text-danger">{errors[index].property}</div>}
                 <input
-                  type="text"
+                  type="number"
                   placeholder="# of Buildings"
+                  onBlur={(e) => formatNumberThousand(e)}
                   value={property.buildings}
                   onChange={(e) => setSelection(index, "buildings", e.target.value)}
                 />

@@ -1,4 +1,3 @@
-require('dotenv').config();
 const { v4: uuidv4 } = require('uuid');
 const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const multerS3 = require('multer-s3');

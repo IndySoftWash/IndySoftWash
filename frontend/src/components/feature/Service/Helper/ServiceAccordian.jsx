@@ -452,7 +452,7 @@ const recoverImage = (serviceId, imageId) => {
                   </div>
                   <div className="bottom-section width-100">
                     <div className="head">
-                      <h4>Selected Frequencies: *</h4>
+                      <h4>Delete Frequencies: *</h4>
                     </div>
                     <div className="grid-cd width-100 input-section  gtc-6">
                       {value?.frequency?.map((freq) => (
