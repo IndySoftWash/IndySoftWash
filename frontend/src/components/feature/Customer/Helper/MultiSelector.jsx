@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { generateUniqueId } from "../../../../utils/UniqueIdGenerator";
 import { formatNumberThousand } from "../../../../utils/Formatter";
+import ErrorTooltip from '../../../shared/Tooltip/ErrorTooltip'
 
-const MultiSelector = ({ onDataChange, paramData }) => {
+const MultiSelector = ({ onDataChange, paramData, triggerValidate, validate, setValidate }) => {
   const [properties, setProperties] = useState([
     { 
       propertyName: "", 
@@ -48,8 +49,8 @@ const MultiSelector = ({ onDataChange, paramData }) => {
       if (!property.units) error.units = "No. of Units is required";
       if (!property.billingAddress) error.billingAddress = "Billing Address is required";
       if (!property.serviceAddress) error.serviceAddress = "Service Address is required";
-      if (property.propertyType.length === 0) error.propertyType = "At least one property type is required";
-      if (property.propertyFeatures.length === 0) error.propertyFeatures = "At least one property feature is required";
+      // if (property.propertyType.length === 0) error.propertyType = "At least one property type is required";
+      // if (property.propertyFeatures.length === 0) error.propertyFeatures = "At least one property feature is required";
       return error;
     });
     setErrors(validationErrors);
@@ -107,13 +108,18 @@ const MultiSelector = ({ onDataChange, paramData }) => {
 
   useEffect(() => {
     // Validate data and send validation errors to the parent
-    // validateData();
-  }, [properties]);
+    if (triggerValidate > 0) {
+      // console.log(resp)
+    }
+    const resp = validateData()
+    setValidate(resp)
+    // triggerValidate && validateData();
+  }, [triggerValidate, properties]);
 
   return (
     <>
       <div className="box-cs">
-        {properties.map((property, index) => (
+        {properties?.map((property, index) => (
           <div key={index} className="mt-5">
             {(index + 1) !== 1 && (
               <div className={`py-4 d-flex cs-between ${(index + 1) !== 1 && 'cs-border'}`}>
@@ -126,50 +132,92 @@ const MultiSelector = ({ onDataChange, paramData }) => {
                 <h5 className="font-1 fw-700 font-size-16">Property Details :</h5>
               </div>
               <div className="input-section my-2">
-                <input
-                  type="text"
-                  placeholder="Property Name"
-                  value={property.propertyName}
-                  onChange={(e) => setSelection(index, "propertyName", e.target.value)}
-                />
-                {errors[index]?.propertyName && <div className="error text-danger">{errors[index].propertyName}</div>}
-                <input
-                  type="text"
-                  placeholder="Management Company"
-                  value={property.property}
-                  onChange={(e) => setSelection(index, "property", e.target.value)}
-                />
-                {errors[index]?.property && <div className="error text-danger">{errors[index].property}</div>}
-                <input
-                  type="number"
-                  placeholder="# of Buildings"
-                  onBlur={(e) => formatNumberThousand(e)}
-                  value={property.buildings}
-                  onChange={(e) => setSelection(index, "buildings", e.target.value)}
-                />
+                <div className="position-rel">
+                  <input
+                    type="text"
+                    className={`${errors[index]?.propertyName && 'is-invalid mb-3'} w-100`}
+                    placeholder="Property Name"
+                    value={property.propertyName}
+                    onChange={(e) => setSelection(index, "propertyName", e.target.value)}
+                  />
+                  <ErrorTooltip 
+                    message={errors[index]?.propertyName}
+                    visible={errors[index]?.propertyName ? true : false}
+                  />
+                  {/* {errors[index]?.propertyName && <div className="error mt-1 text-danger">{errors[index].propertyName}</div>} */}
+                </div>
+                <div className="position-rel">
+                  <input
+                    type="text"
+                    className={`${errors[index]?.property && 'is-invalid mb-3'} w-100`}
+                    placeholder="Management Company"
+                    value={property.property}
+                    onChange={(e) => setSelection(index, "property", e.target.value)}
+                  />
+                  <ErrorTooltip 
+                    message={errors[index]?.property}
+                    visible={errors[index]?.property ? true : false}
+                  />
+                  {/* {errors[index]?.property && <div className="error mt-1 text-danger">{errors[index].property}</div>} */}
+                </div>
+                <div className="position-rel">
+                  <input
+                    type="number"
+                    className={`${errors[index]?.buildings && 'is-invalid mb-3'} w-100`}
+                    placeholder="# of Buildings"
+                    onBlur={(e) => formatNumberThousand(e)}
+                    value={property.buildings}
+                    onChange={(e) => setSelection(index, "buildings", e.target.value)}
+                  />
+                  <ErrorTooltip 
+                    message={errors[index]?.buildings}
+                    visible={errors[index]?.buildings ? true : false}
+                  />
+                </div>
                 {/* {errors[index]?.buildings && <div className="error text-danger">{errors[index].buildings}</div>} */}
-                <input
-                  type="number"
-                  placeholder="No. Of Units"
-                  value={property.units}
-                  onChange={(e) => setSelection(index, "units", e.target.value)}
-                />
-                {errors[index]?.units && <div className="error text-danger">{errors[index].units}</div>}
+                <div className="position-rel">
+                  <input
+                    type="number"
+                    className={`${errors[index]?.units && 'is-invalid mb-3'} w-100`}
+                    placeholder="No. Of Units"
+                    value={property.units}
+                    onChange={(e) => setSelection(index, "units", e.target.value)}
+                  />
+                  <ErrorTooltip 
+                    message={errors[index]?.units}
+                    visible={errors[index]?.units ? true : false}
+                  />
+                </div>
+                {/* {errors[index]?.units && <div className="error text-danger">{errors[index].units}</div>} */}
               </div>
               <div className="input-section gtc-equal my-2">
-                <input
-                  type="text"
-                  placeholder="Billing Address"
-                  value={property.billingAddress}
-                  onChange={(e) => setSelection(index, "billingAddress", e.target.value)}
-                />
+                <div className="position-rel">
+                  <input
+                    type="text"
+                    className={`${errors[index]?.billingAddress && 'is-invalid mb-3'} w-100`}
+                    placeholder="Billing Address"
+                    value={property?.billingAddress}
+                    onChange={(e) => setSelection(index, "billingAddress", e.target.value)}
+                  />
+                  <ErrorTooltip 
+                    message={errors[index]?.billingAddress}
+                    visible={errors[index]?.billingAddress ? true : false}
+                  />
+                </div>
                 {/* {errors[index]?.billingAddress && <div className="error text-danger">{errors[index].billingAddress}</div>} */}
-                <input
-                  type="text"
-                  placeholder="Service Address"
-                  value={property.serviceAddress}
-                  onChange={(e) => setSelection(index, "serviceAddress", e.target.value)}
-                />
+                <div className="position-rel">
+                  <input
+                    type="text"
+                    className={`${errors[index]?.serviceAddress && 'is-invalid mb-3'} w-100`}
+                    placeholder="Service Address"
+                    value={property?.serviceAddress}
+                    onChange={(e) => setSelection(index, "serviceAddress", e.target.value)}
+                  />
+                  <ErrorTooltip 
+                    message={errors[index]?.serviceAddress}
+                    visible={errors[index]?.serviceAddress ? true : false}
+                  />
+                </div>
                 {/* {errors[index]?.serviceAddress && <div className="error text-danger">{errors[index].serviceAddress}</div>} */}
               </div>
             </div>

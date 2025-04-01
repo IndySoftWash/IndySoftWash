@@ -19,6 +19,8 @@ const AddCustomer = () => {
   const customerDetail = useSelector(state => state.AdminDataSlice.customers)
 
   const [images, setImages] = useState([]);
+  const [validate, setValidate] = useState(false)
+  const [triggerValidate, setTriggerValidate] = useState(0)
   const [getPropertyData, setGetPropertyData] = useState([])
   const [loading, setLoading] = useState(false)
   const [createDate, setCreateDate] = useState(() => {
@@ -38,7 +40,7 @@ const AddCustomer = () => {
 
 
   const addCustomerForm = useFormik({
-    // validationSchema : validationSchema,
+    // validationSchema : validationSchema, 
     initialValues: {
       uniqueid: generateUniqueId(),
       createDate,
@@ -73,7 +75,16 @@ const AddCustomer = () => {
       additionalNotes: "",
     },
     onSubmit: async (formData) => {
+
       setLoading(true);
+      setTriggerValidate(triggerValidate + 1)
+      
+      if(!validate) {
+        setLoading(false);
+        toast.error("Fill the required fields")
+        return
+      }
+      
       
       // Create a new FormData instance
       const vformData = new FormData();
@@ -340,6 +351,7 @@ const AddCustomer = () => {
                     {["firstName", "email", "phone", "company"].map((field) => (
                       <div key={field} className="form-group ">
                         <input
+                          required
                           type={field === "phone" ? "number" : "text"}
                           className={`form-control ${addCustomerForm.errors.personalDetails?.[field] && addCustomerForm.touched.personalDetails?.[field] && 'is-invalid'}`}
                           placeholder={field === "firstName" ? 'Full Name' : field
@@ -415,6 +427,9 @@ const AddCustomer = () => {
                     <MultiSelector
                         onDataChange={handleMultiSelectorChange}
                         paramData={getPropertyData}
+                        triggerValidate={triggerValidate}
+                        validate={validate}
+                        setValidate={setValidate}
                     />
                 </div>
 

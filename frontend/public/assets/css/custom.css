@@ -1485,11 +1485,21 @@ li.active::after {
 .cs-modal .layout {
     border-radius: 20px;
     background: #FFF;
-    height: 200px;
+    max-height: 350px;
     margin: 250px auto;
+    /* overflow-y: auto; */
     width: 500px;
     padding: 30px;
     transition: 0.5s;
+    &::-webkit-scrollbar {
+        width: 6px !important;
+        /* display: none !important; */
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #388CFF;
+        border-radius: 6px !important;
+        height: 10px !important;
+    }
 }
 
 .cs-modal .layout img {
@@ -1995,4 +2005,25 @@ li.active::after {
     height: 20px;
     border-radius: 50%;
     object-fit: cover;
+}
+
+.error-tooltip {
+    position: absolute;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+    max-width: 200px;
+    z-index: 10;
+    top: 30px;
+    /* Position tooltip below the input */
+    right: 16px;
+    transform: translateX(10px);
+}
+
+.error-tooltip .error-message {
+    display: block;
+    font-weight: bold;
 }

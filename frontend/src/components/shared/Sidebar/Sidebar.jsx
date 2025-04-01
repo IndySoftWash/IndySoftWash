@@ -13,7 +13,9 @@ const Sidebar = () => {
     const itemActive = useSelector(state => state.ServiceDataSlice.itemActive)
 
     useEffect(()=>{
-        setActive(location.pathname)
+        setActive(location.pathname?.split('/')[1])
+        // console.log(location.pathname?.split('/')[1])
+        // console.log(location.pathname)
     }, [location])
 
     const closeSidebar = () => {
@@ -32,50 +34,50 @@ const Sidebar = () => {
                 </NavLink>
                 <div className="menu">
                     <ul>
-                    <li className={active === '/' && 'active'}>
+                    <li className={active === '' && 'active'}>
                         <NavLink onClick={closeSidebar} to="/">
                         <img src="/assets/img/m-1.svg" />
                         Dashboard
                         </NavLink>
                     </li>
-                    <li className={active === '/customer-list' && 'active'}>
+                    <li className={(active === 'customer-list' || active === 'customer-detail' || active === 'add-customer') && 'active'}>
                         <NavLink onClick={closeSidebar} to="/customer-list">
                         <img src="/assets/img/list.png" />
                         Customer List
                         </NavLink>
                     </li>
-                    <li className={active === '/proposal' && 'active'}>
+                    <li className={(active === 'proposal' || active === 'add-proposal' || active === 'proposal-detail' || active === 'service-detail') && 'active'}>
                         <NavLink onClick={closeSidebar} to="/proposal">
                         <img src="/assets/img/file.svg" />
                         Proposal
                         </NavLink>
                     </li>
-                    <li className={active === '/services' && 'active'}>
+                    <li className={(active === 'services' || active === 'add-service') && 'active'}>
                         <NavLink onClick={closeSidebar} to="/services">
                         <img src="/assets/img/service.svg" />
                         Services
                         </NavLink>
                     </li>
-                    <li className={active === '/schedule' && 'active'}>
+                    <li className={active === 'schedule' && 'active'}>
                         <NavLink onClick={closeSidebar} to="/schedule">
                         <img src="/assets/img/schedule.svg" />
                         Schedule
                         </NavLink>
                     </li>
-                    <li className={active === '/calendar' && 'active'}>
+                    <li className={active === 'calendar' && 'active'}>
                         <NavLink onClick={closeSidebar} to="/calendar">
                         <img src="/assets/img/schedule.svg" />
                         Calendar
                         </NavLink>
                     </li>
-                    <li className={active === '/active-overview' && 'active'}>
+                    <li className={active === 'active-overview' && 'active'}>
                         <NavLink className='message-tag' onClick={()=>{closeSidebar(), dispatch(hanldeStatusActive(false))}} to="/active-overview">
                         <img src="/assets/img/active.svg" />
                         Active Overview
                         {itemActive && <div className="cs-status status-bg-active"></div>}
                         </NavLink>
                     </li>
-                    <li className={active === '/employees' && 'active'}>
+                    <li className={(active === 'employees' || active === 'add-employee') && 'active'}>
                         <NavLink onClick={closeSidebar} to="/employees">
                         <img src="/assets/img/employee.svg" />
                         Employees
@@ -83,13 +85,13 @@ const Sidebar = () => {
                     </li>
                     </ul>
                     <ul className="other-menu">
-                    <li className={active === '/setting' && 'active'}>
+                    <li className={active === 'setting' && 'active'}>
                         <NavLink onClick={closeSidebar} to="/setting">
                         <img src="/assets/img/setting.svg" />
                         Settings
                         </NavLink>
                     </li>
-                    <li className={active === '/profile' && 'active'}>
+                    <li className={active === 'profile' && 'active'}>
                         <NavLink onClick={closeSidebar} to="/profile">
                         <img src="/assets/img/profile.svg" />
                         My Profile
