@@ -8,6 +8,8 @@ import { handleAddService } from "../../../../redux/AdminDataSlice";
 import Spinner from "../../../shared/Loader/Spinner";
 import { formatNumberInput } from '../../../../utils/Formatter'
 import ToggleButton from "../../../shared/Buttons/ToggleButton";
+import ErrorTooltip from "../../../shared/Tooltip/ErrorTooltip";
+import { toast } from "react-toastify";
 
 const AddServiceModal = ({ proposalId, customerId, propertyId }) => {
 
@@ -113,14 +115,54 @@ const AddServiceModal = ({ proposalId, customerId, propertyId }) => {
     };
 
     // Handle image upload
-    const handleImageUpload = (event) => {
-        const files = Array.from(event.target.files); // Get all selected files
-        const newImageFiles = files.map((file) => ({
-          file,
-          preview: URL.createObjectURL(file), // Generate a preview URL for the image
-        }));
-        setImage((prevImages) => [...prevImages, ...newImageFiles]); // Add to existing images
-    };
+    // const handleImageUpload = (event) => {
+    //     const files = Array.from(event.target.files); // Get all selected files
+    //     const newImageFiles = files.map((file) => ({
+    //       file,
+    //       preview: URL.createObjectURL(file), // Generate a preview URL for the image
+    //     }));
+    //     setImage((prevImages) => [...prevImages, ...newImageFiles]); // Add to existing images
+    // };
+
+        // Handle input changes for text inputs and file uploads
+        const handleImageUpload = (e) => {
+            const { name, value, type, files } = e.target;
+    
+            if (type === 'file') {
+                const acceptedFormats = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'];
+                const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+                const newImageFiles = [];
+    
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+    
+                    // Check file size
+                    if (file.size > maxSize) {
+                        toast.warn(`File ${file.name} exceeds the 2MB size limit.`);
+                        continue; // Skip this file
+                    }
+    
+                    // Check file type
+                    if (!acceptedFormats.includes(file.type)) {
+                        toast.warn(`File ${file.name} is not an accepted format. Please upload JPEG, PNG, SVG, or WEBP.`);
+                        continue; // Skip this file
+                    }
+    
+                    // If the file is valid, add it to the newImageFiles array
+                    newImageFiles.push({
+                        file,
+                        preview: URL.createObjectURL(file), // Generate a preview URL for the image
+                    });
+                }
+    
+                // // Update the form values with the valid image files
+                // setFormValues((prevValues) => ({
+                //     ...prevValues,
+                //     [name]: newImageFiles, // Assuming you want to store the images in the form values
+                // }));
+                setImage((prevImages) => [...prevImages, ...newImageFiles]);
+            }
+        };
 
     useEffect(()=>{
         setFormValues({...formValues, additionalInfo: image})
@@ -335,6 +377,10 @@ const AddServiceModal = ({ proposalId, customerId, propertyId }) => {
                                                             className="camera-icon"
                                                         />
                                                         <p>Upload Photos</p>
+                                                        <ErrorTooltip
+                                                            message={"The image should be less then 2mb"}
+                                                            visible={ true }
+                                                        />
                                                         </div>
                                                     </>
                                                 )}

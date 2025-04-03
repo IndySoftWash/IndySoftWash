@@ -623,6 +623,7 @@ li.active::after {
 .box-cs .input-section select {
     color: #979797;
     text-align: left;
+    min-width: 0;
     font-family: "DM Sans";
     font-size: 16px;
     font-style: normal;
@@ -2012,15 +2013,13 @@ li.active::after {
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
-    border-radius: 5px;
-    padding: 5px 10px;
-    font-size: 12px;
+    border-radius: 4px;
+    padding: 2px 5px;
+    font-size: 10px;
     max-width: 200px;
     z-index: 10;
-    top: 30px;
-    /* Position tooltip below the input */
-    right: 16px;
-    transform: translateX(10px);
+    top: 0;
+    right: 0;
 }
 
 .error-tooltip .error-message {

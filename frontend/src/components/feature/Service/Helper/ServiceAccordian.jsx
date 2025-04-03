@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';  // Import the default CSS for Toastify
 import { getPerCleaningCost } from "../../../../utils/ArithematicCalculation";
 import { formatNumberInput } from "../../../../utils/Formatter";
+import ErrorTooltip from "../../../shared/Tooltip/ErrorTooltip";
 
 
 const ServiceAccordian = ({ property, service, onChangeData, getServiceid }) => {
@@ -247,21 +248,68 @@ useEffect(()=>{
 }, [servicesData, image, removeImage, removedFrequency])
 
 
+// const handleImageUpload = (event, serviceId) => {
+//   if (!event.target.files.length) return;
+
+//   const files = Array.from(event.target.files);
+//   const newImageFiles = files.map((file) => {
+//     const fileExtension = file.name.split(".").pop();
+//     const newFileName = `${serviceId}_${Date.now()}.${fileExtension}`;
+//     const renamedFile = new File([file], newFileName, { type: file.type });
+    
+//     return {
+//       file: renamedFile,
+//       preview: URL.createObjectURL(file),
+//     };
+//   });
+
+//   setImage((prevImages) => ({
+//     ...prevImages,
+//     [serviceId]: [...(prevImages[serviceId] || []), ...newImageFiles],
+//   }));
+
+//   // Reset file input to allow re-upload of the same file
+//   if (fileInputRef.current[serviceId]) {
+//     fileInputRef.current[serviceId].value = "";
+//   }
+// };
+
 const handleImageUpload = (event, serviceId) => {
   if (!event.target.files.length) return;
 
   const files = Array.from(event.target.files);
-  const newImageFiles = files.map((file) => {
+  const acceptedFormats = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'];
+  const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+  const newImageFiles = [];
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+
+    // Check file size
+    if (file.size > maxSize) {
+      toast.warn(`File ${file.name} exceeds the 2MB size limit.`);
+      continue; // Skip this file
+    }
+
+    // Check file type
+    if (!acceptedFormats.includes(file.type)) {
+      toast.warn(`File ${file.name} is not an accepted format. Please upload JPEG, PNG, SVG, or WEBP.`);
+      continue; // Skip this file
+    }
+
+    // Rename the file
     const fileExtension = file.name.split(".").pop();
     const newFileName = `${serviceId}_${Date.now()}.${fileExtension}`;
     const renamedFile = new File([file], newFileName, { type: file.type });
-    
-    return {
+
+    // Add the valid file to the newImageFiles array
+    newImageFiles.push({
       file: renamedFile,
       preview: URL.createObjectURL(file),
-    };
-  });
+    });
+  }
 
+  // Update the state with the new image files
   setImage((prevImages) => ({
     ...prevImages,
     [serviceId]: [...(prevImages[serviceId] || []), ...newImageFiles],
@@ -558,6 +606,10 @@ const recoverImage = (serviceId, imageId) => {
                     >
                       <img src="/assets/img/camera.svg" alt="Camera Icon" className="camera-icon" />
                       <p>Upload Photos</p>
+                      <ErrorTooltip
+                          message={"The image should be less then 2mb"}
+                          visible={ true }
+                      />
                     </div>
 
                     <input

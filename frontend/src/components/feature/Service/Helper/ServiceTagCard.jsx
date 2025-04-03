@@ -57,7 +57,7 @@ const ServiceTagCard = ({ service, property }) => {
                     </div>
                     <div className="inner-layout">
                     <h4>Per Door Investment</h4>
-                    <p>${(totalCost / [property?.units]) / 12?.toFixed(2)} / Unit PM</p>
+                    <p>${((totalCost / [property?.units]) / 12)?.toFixed(2)} / Unit PM</p>
                     </div>
             </div>
 

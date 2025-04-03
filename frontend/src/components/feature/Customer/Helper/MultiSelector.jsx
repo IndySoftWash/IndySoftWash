@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { generateUniqueId } from "../../../../utils/UniqueIdGenerator";
 import { formatNumberThousand } from "../../../../utils/Formatter";
 import ErrorTooltip from '../../../shared/Tooltip/ErrorTooltip'
+import InputWithLabel from "../../../shared/Field/InputField";
 
 const MultiSelector = ({ onDataChange, paramData, triggerValidate, validate, setValidate }) => {
   const [properties, setProperties] = useState([
@@ -133,10 +134,10 @@ const MultiSelector = ({ onDataChange, paramData, triggerValidate, validate, set
               </div>
               <div className="input-section my-2">
                 <div className="position-rel">
-                  <input
+                  <InputWithLabel 
                     type="text"
-                    className={`${errors[index]?.propertyName && 'is-invalid mb-3'} w-100`}
-                    placeholder="Property Name"
+                    className={`${errors[index]?.propertyName && 'is-invalid'}`}
+                    label="Property Name"
                     value={property.propertyName}
                     onChange={(e) => setSelection(index, "propertyName", e.target.value)}
                   />
@@ -147,10 +148,10 @@ const MultiSelector = ({ onDataChange, paramData, triggerValidate, validate, set
                   {/* {errors[index]?.propertyName && <div className="error mt-1 text-danger">{errors[index].propertyName}</div>} */}
                 </div>
                 <div className="position-rel">
-                  <input
+                  <InputWithLabel 
                     type="text"
-                    className={`${errors[index]?.property && 'is-invalid mb-3'} w-100`}
-                    placeholder="Management Company"
+                    className={`${errors[index]?.property && 'is-invalid'}`}
+                    label="Management Company"
                     value={property.property}
                     onChange={(e) => setSelection(index, "property", e.target.value)}
                   />
@@ -161,25 +162,25 @@ const MultiSelector = ({ onDataChange, paramData, triggerValidate, validate, set
                   {/* {errors[index]?.property && <div className="error mt-1 text-danger">{errors[index].property}</div>} */}
                 </div>
                 <div className="position-rel">
-                  <input
-                    type="number"
-                    className={`${errors[index]?.buildings && 'is-invalid mb-3'} w-100`}
-                    placeholder="# of Buildings"
-                    onBlur={(e) => formatNumberThousand(e)}
-                    value={property.buildings}
-                    onChange={(e) => setSelection(index, "buildings", e.target.value)}
-                  />
+                    <InputWithLabel 
+                      type="number"
+                      className={`${errors[index]?.buildings && 'is-invalid'}`}
+                      label="# of Buildings"
+                      value={property.buildings}
+                      onChange={(e) => setSelection(index, "buildings", e.target.value)}
+                    />
                   <ErrorTooltip 
                     message={errors[index]?.buildings}
                     visible={errors[index]?.buildings ? true : false}
-                  />
+                    />
                 </div>
                 {/* {errors[index]?.buildings && <div className="error text-danger">{errors[index].buildings}</div>} */}
                 <div className="position-rel">
-                  <input
+                  <InputWithLabel 
                     type="number"
-                    className={`${errors[index]?.units && 'is-invalid mb-3'} w-100`}
-                    placeholder="No. Of Units"
+                    className={`${errors[index]?.units && 'is-invalid'}`}
+                    onBlur={formatNumberThousand}
+                    label="No. Of Units"
                     value={property.units}
                     onChange={(e) => setSelection(index, "units", e.target.value)}
                   />
@@ -192,10 +193,10 @@ const MultiSelector = ({ onDataChange, paramData, triggerValidate, validate, set
               </div>
               <div className="input-section gtc-equal my-2">
                 <div className="position-rel">
-                  <input
+                  <InputWithLabel 
                     type="text"
-                    className={`${errors[index]?.billingAddress && 'is-invalid mb-3'} w-100`}
-                    placeholder="Billing Address"
+                    className={`${errors[index]?.billingAddress && 'is-invalid'}`}
+                    label="Billing Address"
                     value={property?.billingAddress}
                     onChange={(e) => setSelection(index, "billingAddress", e.target.value)}
                   />
@@ -206,10 +207,10 @@ const MultiSelector = ({ onDataChange, paramData, triggerValidate, validate, set
                 </div>
                 {/* {errors[index]?.billingAddress && <div className="error text-danger">{errors[index].billingAddress}</div>} */}
                 <div className="position-rel">
-                  <input
+                  <InputWithLabel 
                     type="text"
-                    className={`${errors[index]?.serviceAddress && 'is-invalid mb-3'} w-100`}
-                    placeholder="Service Address"
+                    className={`${errors[index]?.serviceAddress && 'is-invalid'}`}
+                    label="Service Address"
                     value={property?.serviceAddress}
                     onChange={(e) => setSelection(index, "serviceAddress", e.target.value)}
                   />

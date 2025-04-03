@@ -1,0 +1,86 @@
+/* General styles for the select container */
+
+.select-container {
+    position: relative;
+    /* margin-bottom: 20px; */
+    width: 100%;
+}
+
+.select-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.select-field {
+    /* padding: 10px;
+    padding-left: 10px;
+    padding-top: 30px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px; */
+    background: transparent;
+    border-radius: 6px;
+    border: 1px solid #97979782;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px;
+    color: #979797;
+    font-family: "DM Sans";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    width: 100%;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.select-label {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #979797;
+    font-family: "DM Sans";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    pointer-events: none;
+    /* Prevents label from interfering with the select field */
+    transition: all 0.3s ease;
+    /* Smooth transition for label movement */
+}
+
+
+/* Move label to the top-left when select is focused or contains a value */
+
+.select-wrapper.focused .select-label,
+.select-field:not([value=""])+.select-label {
+    top: 0;
+    left: 10px;
+    font-size: 12px;
+    color: #202224;
+    background-color: #fff;
+    /* Change color on focus */
+}
+
+.select-field:focus {
+    border-color: #202224;
+}
+
+.select-field:focus+.select-label {
+    color: #202224;
+}
+
+
+/* Hide the placeholder when the select has a value */
+
+.select-field:focus::placeholder,
+.select-field:not([value=""])::placeholder {
+    opacity: 0;
+}

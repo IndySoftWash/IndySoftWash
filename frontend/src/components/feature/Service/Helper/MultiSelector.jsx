@@ -5,6 +5,8 @@ import { frequencyDigitConverter } from "../../../../utils/frequencyDigitConvert
 import ToggleButton from "../../../shared/Buttons/ToggleButton"
 import { formatNumberInput } from "../../../../utils/Formatter"
 import { useEffect } from "react"
+import { toast } from "react-toastify"
+import ErrorTooltip from "../../../shared/Tooltip/ErrorTooltip"
 
 const MultiSelector = ({ onDataChange }) => {
 
@@ -59,12 +61,64 @@ const MultiSelector = ({ onDataChange }) => {
         }
     }, [adminData])
 
+    // const handleImageUpload = (event, index) => {
+    //     const files = Array.from(event.target.files); // Get all selected files
+    //     const newImageFiles = files.map((file) => ({
+    //         file,
+    //         preview: URL.createObjectURL(file), // Generate a preview URL for the image
+    //     }));
+    
+    //     setInitialValues((prevData) => {
+    //         const updatedData = [...prevData]; // Clone the main array to avoid mutating the state
+    
+    //         // Ensure the object at the specified index exists
+    //         if (!updatedData[index]) {
+    //             updatedData[index] = {}; // Initialize the object if it doesn't exist
+    //         }
+    
+    //         // Update the `additionalInfo` field inside the object at the specified index
+    //         updatedData[index] = {
+    //             ...updatedData[index], // Preserve existing properties of the object
+    //             additionalInfo: updatedData[index].additionalInfo
+    //                 ? [...updatedData[index].additionalInfo, ...newImageFiles] // Append new files if `additionalInfo` already exists
+    //                 : newImageFiles, // Initialize with new files if `additionalInfo` doesn't exist
+    //         };
+    
+    //         return updatedData; // Update the state with the modified array
+    //     });
+    // };    
+    
     const handleImageUpload = (event, index) => {
         const files = Array.from(event.target.files); // Get all selected files
-        const newImageFiles = files.map((file) => ({
-            file,
-            preview: URL.createObjectURL(file), // Generate a preview URL for the image
-        }));
+        const acceptedFormats = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'];
+        const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    
+        // Create an array to hold valid images
+        const newImageFiles = [];
+    
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+    
+            // Check file size
+            if (file.size > maxSize) {
+                toast.warn(`File ${file.name} exceeds the 2MB size limit.`);
+                continue; // Skip this file
+            }
+    
+            // Check file type
+            if (!acceptedFormats.includes(file.type)) {
+                toast.warn(`File ${file.name} is not an accepted format. Please upload JPEG, PNG, SVG, or WEBP.`);
+                continue; // Skip this file
+            }
+    
+            // If the file is valid, add it to the newImageFiles array
+            newImageFiles.push({
+                file,
+                preview: URL.createObjectURL(file), // Generate a preview URL for the image
+            });
+        }
+    
+        // console.log("New Image Files:", newImageFiles); // Debugging: Check valid images
     
         setInitialValues((prevData) => {
             const updatedData = [...prevData]; // Clone the main array to avoid mutating the state
@@ -82,9 +136,11 @@ const MultiSelector = ({ onDataChange }) => {
                     : newImageFiles, // Initialize with new files if `additionalInfo` doesn't exist
             };
     
+            console.log("Updated Data:", updatedData); // Debugging: Check updated data
+    
             return updatedData; // Update the state with the modified array
         });
-    };    
+    };
     
     const handleRemoveImage = (index, dataIndex) => {
         setInitialValues((prevData) => {
@@ -199,8 +255,6 @@ const MultiSelector = ({ onDataChange }) => {
 
     useEffect(()=>{onDataChange(initialValues)}, [initialValues])
 
-
-
     const addServices = () => {
         setServiceToggle((prev) => [...serviceToggle, true])
         setInitialValues((prevData) => [
@@ -246,7 +300,7 @@ const MultiSelector = ({ onDataChange }) => {
             },
         ]);
     };
-      
+    
     const removeService = (indexToRemove) => {
         setServiceToggle((prev) => prev.filter((_, index) => index !== indexToRemove)); // Remove the toggle state for the corresponding index
     
@@ -263,17 +317,17 @@ const MultiSelector = ({ onDataChange }) => {
                     <>
                     <div key={index} className="box-cs mt-4">
                         <div className="row gap-20">
-                        <div className="col-md-12">
-                            <div className="service-header-repeater">
-                            <h4 className="font-1 fw-700">Add Service {index > 0 && index+1}</h4>
-                            <div className='toggle-section'>
-                                <ToggleButton toggle={getToggle} index={index} />
-                                {
-                                    index > 0 && <button type='button' onClick={()=>removeService(index)} className='btn btn-danger'>Remove <i class="fa-solid fa-trash-can-slash" style={{color: '#fff'}} /></button>
-                                }
+                            <div className="col-md-12">
+                                <div className="service-header-repeater">
+                                    <h4 className="font-1 fw-700">Add Service {index > 0 && index+1}</h4>
+                                    <div className='toggle-section'>
+                                        <ToggleButton toggle={getToggle} index={index} />
+                                        {
+                                            index > 0 && <button type='button' onClick={()=>removeService(index)} className='btn btn-danger'>Remove <i class="fa-solid fa-trash-can-slash" style={{color: '#fff'}} /></button>
+                                        }
+                                    </div>
+                                </div>
                             </div>
-                            </div>
-                        </div>
                         <div className="col-md-8">
 
                             <div className="grid-cs gtc-1 pt-3">
@@ -361,6 +415,10 @@ const MultiSelector = ({ onDataChange }) => {
                                             className="camera-icon"
                                             />
                                             <p>Upload Photos</p>
+                                            <ErrorTooltip
+                                                message={"The image should be less then 2mb"}
+                                                visible={ true }
+                                            />
                                         </div>
                                     </>
                                     )}

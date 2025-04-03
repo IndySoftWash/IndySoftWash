@@ -1,0 +1,75 @@
+/* General styles for the input container */
+
+.input-container {
+    position: relative;
+    /* margin-bottom: 20px; */
+    width: 100%;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-field {
+    /* padding: 10px;
+    padding-left: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    padding-top: 20px;
+    border-radius: 5px; */
+    background: transparent;
+    border-radius: 6px;
+    border: 1px solid #97979782;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px;
+    color: #979797;
+    font-family: "DM Sans";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    width: 100%;
+    outline: none;
+}
+
+.input-label {
+    position: absolute;
+    left: 10px;
+    cursor: text;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #979797;
+    font-family: "DM Sans";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    transition: all 0.3s ease;
+    /* Smooth transition for label movement */
+}
+
+.input-wrapper.focused .input-label {
+    top: 0;
+    left: 10px;
+    font-size: 12px;
+    background-color: #fff;
+    color: #202224;
+    /* Change color on focus */
+}
+
+.input-field:focus {
+    border-color: #202224;
+}
+
+.input-field:focus+.input-label {
+    color: #202224;
+}
+
+.input-field:not(:focus):valid+.input-label {
+    color: #202224;
+    /* When the field contains a value */
+}

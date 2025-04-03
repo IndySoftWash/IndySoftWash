@@ -9,6 +9,9 @@ import { addCustomer, editCustomer } from "../../../services/CustomerService";
 import { generateUniqueId } from '../../../utils/UniqueIdGenerator'
 import Spinner from "../../shared/Loader/Spinner";
 import { toast } from "react-toastify";
+import InputWithLabel from "../../shared/Field/InputField";
+import SelectWithLabel from "../../shared/Field/SelectField";
+import ErrorTooltip from "../../shared/Tooltip/ErrorTooltip";
 
 const AddCustomer = () => {
   const navigate = useNavigate();
@@ -34,9 +37,9 @@ const AddCustomer = () => {
   const fileInputRef = useRef(null);
   const [removedImages, setRemovedImages] = useState([]);
 
-  useEffect(() => {
-    // console.log(removedImages)
-  }, [removedImages]);
+  // useEffect(() => {
+  //   // console.log(removedImages)
+  // }, [removedImages]);
 
 
   const addCustomerForm = useFormik({
@@ -158,6 +161,7 @@ const AddCustomer = () => {
             email: filteredCustomerData?.personalDetails?.email || "",
             phone: filteredCustomerData?.personalDetails?.phone || "",
             company: filteredCustomerData?.personalDetails?.company || "",
+            status: filteredCustomerData?.personalDetails?.status
           },
           // property: filteredCustomerData?.property || [],
           additionalContact: {
@@ -181,18 +185,55 @@ const AddCustomer = () => {
     }
   }, [customerid, customerDetail]);
 
+
   const handleMultiSelectorChange = (companyInfo) => {
     addCustomerForm.setFieldValue("property", companyInfo);
     // console.log(companyInfo)
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const newImages = files.map(file => ({
-      file,
-      preview: URL.createObjectURL(file)
-    }));
-    setImages(prev => [...prev, ...newImages]);
+  // const handleImageUpload = (e) => {
+  //   const files = Array.from(e.target.files);
+  //   const newImages = files.map(file => ({
+  //     file,
+  //     preview: URL.createObjectURL(file)
+  //   }));
+  //   setImages(prev => [...prev, ...newImages]);
+  // };
+
+  const handleImageUpload = (event) => {
+    const files = event.target.files;
+    const acceptedFormats = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'];
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+  
+    // Create an array to hold valid images
+    const validImages = [];
+  
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+  
+      // Check file size
+      if (file.size > maxSize) {
+        // alert(`File ${file.name} exceeds the 2MB size limit.`);
+        toast.warn(`File ${file.name} exceeds the 2MB size limit.`)
+        continue; // Skip this file
+      }
+  
+      // Check file type
+      if (!acceptedFormats.includes(file.type)) {
+        // alert(`File ${file.name} is not an accepted format. Please upload JPEG, PNG, SVG, or WEBP.`);
+        toast.warn(`File ${file.name} is not an accepted format. Please upload JPEG, PNG, SVG, or WEBP.`)
+        continue; // Skip this file
+      }
+  
+      // If the file is valid, add it to the validImages array
+      validImages.push({
+        file,
+        preview: URL.createObjectURL(file)
+      });
+    }
+  
+    // Update the state with only valid images
+    setImages(prev => [...prev, ...validImages]);
   };
 
   const handleRemoveImage = (index) => {
@@ -206,6 +247,12 @@ const AddCustomer = () => {
   const recoverImage = (imageId) => {
     setRemovedImages(prev => prev.filter(id => id !== imageId));
   };
+
+  const options = [
+    'lead',
+    'current customer',
+    'past customer'
+  ]
 
   return (
     <>
@@ -350,7 +397,7 @@ const AddCustomer = () => {
                     <div className="input-section gtc-3 my-2">
                     {["firstName", "email", "phone", "company"].map((field) => (
                       <div key={field} className="form-group ">
-                        <input
+                        {/* <input
                           required
                           type={field === "phone" ? "number" : "text"}
                           className={`form-control ${addCustomerForm.errors.personalDetails?.[field] && addCustomerForm.touched.personalDetails?.[field] && 'is-invalid'}`}
@@ -365,6 +412,21 @@ const AddCustomer = () => {
                               e.target.value
                             )
                           }
+                        /> */}
+                        <InputWithLabel 
+                          type={field === "phone" ? "number" : "text"}
+                          label={field === "firstName" ? 'Full Name' : field
+                            .split(/(?=[A-Z])/)
+                            .join(" ")
+                            .replace(/\b\w/g, (c) => c.toUpperCase())}
+                            value={addCustomerForm.values.personalDetails[field]}
+                            onChange={(e) =>
+                              addCustomerForm.setFieldValue(
+                                `personalDetails.${field}`,
+                                e.target.value
+                              )
+                            }
+                            required={true}
                         />
                         {/* Display error message for the specific field */}
                         {addCustomerForm.errors.personalDetails?.[field] &&
@@ -375,13 +437,27 @@ const AddCustomer = () => {
                           )}
                       </div>
                     ))}
-                    <select name="status" value={addCustomerForm?.values?.personalDetails?.status} onChange={(e) => {addCustomerForm.setFieldValue("personalDetails.status", e.target.value)}} id="">
+                    {/* <select name="status" value={addCustomerForm?.values?.personalDetails?.status} onChange={(e) => {addCustomerForm.setFieldValue("personalDetails.status", e.target.value)}} id="">
                       <option value="">Select Customer Status</option>
                       <option value="lead">Lead</option>
                       <option value="current customer">Current Customer</option>
                       <option value="past customer">Past Customer</option>
-                    </select>
-                    <input type="text" name="source" placeholder="Source" value={addCustomerForm?.values?.source} onChange={(e) => {addCustomerForm.setFieldValue("source", e.target.value)}} id="" />
+                    </select> */}
+                    <SelectWithLabel 
+                      label='Select Customer Status'
+                      name='status'
+                      value={addCustomerForm?.values?.personalDetails?.status}
+                      onChange={(e) => {addCustomerForm.setFieldValue("personalDetails.status", e.target.value)}}
+                      options={options}
+                    />
+                    <InputWithLabel 
+                      type="text"
+                      name='source'
+                      label="Source"
+                      value={addCustomerForm?.values?.source} 
+                      onChange={(e) => {addCustomerForm.setFieldValue("source", e.target.value)}}
+                    />
+                    {/* <input type="text" name="source" placeholder="Source" value={addCustomerForm?.values?.source} onChange={(e) => {addCustomerForm.setFieldValue("source", e.target.value)}} id="" /> */}
                     </div>
                     {/* <div className="input-section gtc-4 my-2">
                     {["firstName", "lastName", "email", "phone", "company"].map((field) => (
@@ -445,26 +521,25 @@ const AddCustomer = () => {
                             {["detail1", "detail2"].map((detailKey) =>
                             ["full Name", "title", "email", "phone"].map(
                                 (field) => (
-                                <input
-                                    key={`${detailKey}-${field}`}
-                                    type={
+                                <InputWithLabel 
+                                  type={
                                     field === "phone" ? "number" : field === "email" ? "email" : "text"
-                                    }
-                                    placeholder={field
-                                    .split(/(?=[A-Z])/)
-                                    .join(" ")
-                                    .replace(/\b\w/g, (c) => c.toUpperCase())}
-                                    value={
-                                    addCustomerForm.values.additionalContact[
-                                        detailKey
-                                    ][field]
-                                    }
-                                    onChange={(e) =>
+                                  }
+                                  label={field
+                                        .split(/(?=[A-Z])/)
+                                        .join(" ")
+                                        .replace(/\b\w/g, (c) => c.toUpperCase())}
+                                        value={
+                                        addCustomerForm.values.additionalContact[
+                                            detailKey
+                                        ][field]
+                                  }
+                                  onChange={(e) =>
                                     addCustomerForm.setFieldValue(
                                         `additionalContact.${detailKey}.${field === 'full Name' ? 'fullname' : field}`,
                                         e.target.value
                                     )
-                                    }
+                                  }
                                 />
                                 )
                             )
@@ -514,7 +589,7 @@ const AddCustomer = () => {
                           
                           {/* Show newly uploaded images */}
                           {images.map((img, index) => (
-                            <div key={`local-${index}`} className="upload-box">
+                            <div key={`local-${index}`} className="upload-box ">
                               <img src={img.preview} alt="Preview" className="preview-image" />
                               <button
                                 type="button"
@@ -530,6 +605,10 @@ const AddCustomer = () => {
                           <div className="upload-box" onClick={() => fileInputRef.current?.click()}>
                             <img src="/assets/img/camera.svg" alt="Camera Icon" className="camera-icon" />
                             <p>Upload Photos</p>
+                            <ErrorTooltip 
+                              message={"The image should be less then 2mb"}
+                              visible={ true }
+                            />
                           </div>
 
                           <input
