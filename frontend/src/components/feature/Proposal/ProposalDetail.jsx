@@ -474,7 +474,7 @@ const navigateRoute = () => {
                       <div className="pt-4">
                         <div className="service-overview-card desk-show">
                           <div><h4>Service Overview</h4></div>
-                          <div>
+                          <div className="my-3">
                             <p>
                               {selectedServiceData?.description}
                             </p>

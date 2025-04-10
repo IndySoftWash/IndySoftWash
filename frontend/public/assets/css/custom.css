@@ -1235,7 +1235,7 @@ li.active::after {
 .proposal-data p {
     color: #202224;
     font-family: "DM Sans";
-    font-size: 16px;
+    font-size: 14px;
     font-style: normal;
     font-weight: 700;
     line-height: normal;
@@ -1278,7 +1278,7 @@ li.active::after {
 .service-overview-card p {
     color: #FFF;
     font-family: "DM Sans";
-    font-size: 18px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
