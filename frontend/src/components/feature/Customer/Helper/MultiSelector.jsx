@@ -3,8 +3,18 @@ import { generateUniqueId } from "../../../../utils/UniqueIdGenerator";
 import { formatNumberThousand } from "../../../../utils/Formatter";
 import ErrorTooltip from '../../../shared/Tooltip/ErrorTooltip'
 import InputWithLabel from "../../../shared/Field/InputField";
+import { useRef } from "react";
 
 const MultiSelector = ({ onDataChange, paramData, triggerValidate, validate, setValidate }) => {
+  
+  const [isFocused, setIsFocused] = useState(false);
+    const inputRef = useRef()
+
+    const handleFocus = () => {
+        setIsFocused(true);
+        inputRef.current.focus()
+    };
+  
   const [properties, setProperties] = useState([
     { 
       propertyName: "", 
@@ -167,6 +177,10 @@ const MultiSelector = ({ onDataChange, paramData, triggerValidate, validate, set
                       className={`${errors[index]?.buildings && 'is-invalid'}`}
                       label="# of Buildings"
                       value={property.buildings}
+                      onBlur={formatNumberThousand}
+                      setSelection={setSelection}
+                      index={index}
+                      name={'buildings'}
                       onChange={(e) => setSelection(index, "buildings", e.target.value)}
                     />
                   <ErrorTooltip 
@@ -179,9 +193,12 @@ const MultiSelector = ({ onDataChange, paramData, triggerValidate, validate, set
                   <InputWithLabel 
                     type="number"
                     className={`${errors[index]?.units && 'is-invalid'}`}
-                    onBlur={formatNumberThousand}
                     label="No. Of Units"
                     value={property.units}
+                    onBlur={formatNumberThousand}
+                    setSelection={setSelection}
+                    index={index}
+                    name={'units'}
                     onChange={(e) => setSelection(index, "units", e.target.value)}
                   />
                   <ErrorTooltip 

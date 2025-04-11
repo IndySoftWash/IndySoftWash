@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./InputWithLabel.css"; // Import the CSS for styling
 import { useRef } from "react";
 
-const InputWithLabel = ({ label, type = "text", name, value, onChange, required, className, onBlur }) => {
+const InputWithLabel = ({ label, type = "text", name, setSelection, index, value, onChange, required, className, onBlur }) => {
     const [isFocused, setIsFocused] = useState(false);
     const inputRef = useRef()
 
@@ -16,7 +16,7 @@ const InputWithLabel = ({ label, type = "text", name, value, onChange, required,
         if (e.target.value === "") {
         setIsFocused(false);
         } else {
-            onBlur && onBlur(e)
+            onBlur && setSelection(index, name, onBlur(e));
         }
 
     };

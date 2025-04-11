@@ -473,18 +473,18 @@ const recoverImage = (serviceId, imageId) => {
                           <input
                             className="width-100 input-disabled"
                             disabled
-                            type="number"
+                            type="text"
                             placeholder="$"
                             
-                            value={perCleaning || ""}
+                            value={perCleaning?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || ""}
                           />
                           <input
                             className="width-100 input-disabled"
                             disabled
-                            type="number"
+                            type="text"
                             placeholder="$"
                             
-                            value={perCleaning * getFrequency?.frequencyDigit || ""}
+                            value={(perCleaning * getFrequency?.frequencyDigit)?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || ""}
                           />
                           <input
                             className="width-100 input-disabled"
