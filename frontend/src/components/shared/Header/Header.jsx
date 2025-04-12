@@ -29,6 +29,8 @@ const Header = () => {
     return () => unlisten();
   }, [location]);
 
+  // console.log(location)
+
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -60,12 +62,17 @@ const Header = () => {
             <div className="col-md-12">
               <div className="main-header">
                 {/* Go Back Button */}
-                <button
-                  className="text-decoration-none btn desk-show"
-                  onClick={() => previousRoute && navigate(previousRoute)} // Navigate to the previous route
-                >
+                {
+                  location?.pathname !== '/' ? 
+                  <button
+                    className="text-decoration-none btn desk-show"
+                    onClick={() => previousRoute && navigate(previousRoute)} // Navigate to the previous route
+                  >
                   <h4 className="font-1"><i class="fa-solid fa-chevrons-left"></i> Back</h4>
-                </button>
+                  </button>
+                  :
+                  <h4 className="font-1">Dashboard</h4>
+                }
                 <div className="mob-head-flex">
                 {/* Sidebar Toggle */}
                 {isOpen ? (

@@ -106,7 +106,7 @@ const DataTable = ({ title, onDelete, searchQuery, proposalDetail }) => { // Acc
                                         </td>
                                         <td>
                                             <div className="input-section gtc-1">
-                                                <select value={value?.status?.type} onChange={(e)=>changeStatus(e.target.value, value.uniqueid)} name="" id="">
+                                                <select value={value?.status?.type} className="font-size-10" onChange={(e)=>changeStatus(e.target.value, value.uniqueid)} name="" id="">
                                                     <option value="created">created</option>
                                                     <option value="active">active</option>
                                                     <option value="sent">sent</option>
